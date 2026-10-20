@@ -2,300 +2,275 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const easeOutExpo = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
-const clamp01 = (v) => Math.min(1, Math.max(0, v));
-const smoothstep = (a, b, x) => {
-  const t = clamp01((x - a) / (b - a));
-  return t * t * (3 - 2 * t);
-};
-
-/* ------------------------------------------------------------------ *
- *  StellaCore — a compound of two mutually-dual tetrahedra.
- *  A mathematically precise "impossible" solid that reads as a
- *  star when stationary. Metallic dark faces + restrained cyan edges.
- * ------------------------------------------------------------------ */
-function StellaCore({ shared }) {
-  const aRef = useRef();
-  const bRef = useRef();
-  const coreRef = useRef();
-
-  const solidGeo = useMemo(() => new THREE.TetrahedronGeometry(1.06, 0), []);
-  const edgeGeo = useMemo(() => new THREE.EdgesGeometry(solidGeo), [solidGeo]);
-
-  useFrame((state, delta) => {
-    const t = state.clock.elapsedTime;
-    const reduced = shared.current.reduced;
-
-    if (aRef.current) {
-      aRef.current.rotation.y += delta * (reduced ? 0 : 0.15);
-      aRef.current.rotation.x = Math.sin(t * 0.18) * (reduced ? 0.06 : 0.12);
+function createHeroGeometry() {
+  const geo = new THREE.BufferGeometry();
+  const positions = [];
+  const normals = [];
+  const indices = [];
+  
+  const rings = 3;
+  const segments = 64;
+  const baseRadius = 2.5;
+  const tubeRadius = 0.15;
+  
+  for (let r = 0; r < rings; r++) {
+    const radius = baseRadius - r * 0.7;
+    const twist = (r + 1) * 1.5;
+    
+    for (let i = 0; i <= segments; i++) {
+      const u = i / segments;
+      const angle = u * Math.PI * 2;
+      
+      for (let j = 0; j <= 8; j++) {
+        const v = (j - 4) / 4 * tubeRadius;
+        const twistAngle = angle * twist;
+        
+        const cosA = Math.cos(angle);
+        const sinA = Math.sin(angle);
+        const cosT = Math.cos(twistAngle);
+        const sinT = Math.sin(twistAngle);
+        
+        const x = (radius + v * cosT) * cosA;
+        const y = (radius + v * cosT) * sinA;
+        const z = v * sinT + (r - 1) * 0.3;
+        
+        positions.push(x, y, z);
+        
+        const nx = cosA * cosT;
+        const ny = sinA * cosT;
+        const nz = sinT;
+        normals.push(nx, ny, nz);
+      }
     }
-    if (bRef.current) {
-      bRef.current.rotation.y -= delta * (reduced ? 0 : 0.1);
-      bRef.current.rotation.z = Math.cos(t * 0.15) * (reduced ? 0.05 : 0.09);
+  }
+  
+  const vertsPerRing = (segments + 1) * 9;
+  for (let r = 0; r < rings; r++) {
+    for (let i = 0; i < segments; i++) {
+      for (let j = 0; j < 8; j++) {
+        const a = r * vertsPerRing + i * 9 + j;
+        const b = r * vertsPerRing + i * 9 + j + 1;
+        const c = r * vertsPerRing + ((i + 1) % (segments + 1)) * 9 + j;
+        const d = r * vertsPerRing + ((i + 1) % (segments + 1)) * 9 + j + 1;
+        
+        indices.push(a, b, d);
+        indices.push(d, c, a);
+      }
     }
-    if (coreRef.current) {
-      const pulse = reduced ? 1 : 1 + Math.sin(t * 1.5) * 0.08;
-      coreRef.current.scale.setScalar(pulse);
-      coreRef.current.rotation.y += delta * (reduced ? 0 : 0.6);
-      coreRef.current.material.emissiveIntensity = reduced ? 0.8 : 0.75 + Math.sin(t * 1.5) * 0.25;
-    }
-  });
-
-  return (
-    <group>
-      <group ref={aRef}>
-        <mesh geometry={solidGeo}>
-          <meshStandardMaterial
-            color="#0b1622"
-            metalness={0.92}
-            roughness={0.26}
-            flatShading
-            transparent
-            opacity={0.92}
-          />
-        </mesh>
-        <lineSegments geometry={edgeGeo}>
-          <lineBasicMaterial color="#00e5d4" transparent opacity={0.5} />
-        </lineSegments>
-      </group>
-
-      {/* Mirrored twin → the dual tetrahedron (stella octangula) */}
-      <group ref={bRef} scale={[-1, 1, 1]}>
-        <mesh geometry={solidGeo}>
-          <meshStandardMaterial
-            color="#0b1622"
-            metalness={0.92}
-            roughness={0.26}
-            flatShading
-            transparent
-            opacity={0.92}
-            side={THREE.DoubleSide}
-          />
-        </mesh>
-        <lineSegments geometry={edgeGeo}>
-          <lineBasicMaterial color="#929caa" transparent opacity={0.34} />
-        </lineSegments>
-      </group>
-
-      {/* Energy nucleus */}
-      <mesh ref={coreRef}>
-        <octahedronGeometry args={[0.17, 0]} />
-        <meshStandardMaterial
-          color="#00e5d4"
-          emissive="#00e5d4"
-          emissiveIntensity={0.8}
-          metalness={0.3}
-          roughness={0.2}
-          flatShading
-        />
-      </mesh>
-      <pointLight position={[0, 0, 0]} intensity={2.4} distance={7} color="#00e5d4" />
-    </group>
-  );
+  }
+  
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+  return geo;
 }
 
-/* ------------------------------------------------------------------ *
- *  LatticeCage — a large, faint icosahedral wireframe that rotates
- *  against the core to create interlocking depth.
- * ------------------------------------------------------------------ */
-function LatticeCage({ shared }) {
-  const ref = useRef();
-  const geo = useMemo(() => new THREE.IcosahedronGeometry(2.0, 0), []);
-  const edges = useMemo(() => new THREE.EdgesGeometry(geo), [geo]);
-
-  useFrame((state, delta) => {
-    if (!ref.current || shared.current.reduced) return;
-    ref.current.rotation.y -= delta * 0.045;
-    ref.current.rotation.x += delta * 0.018;
-  });
-
-  return (
-    <group ref={ref}>
-      <lineSegments geometry={edges}>
-        <lineBasicMaterial color="#16323c" transparent opacity={0.42} />
-      </lineSegments>
-    </group>
-  );
+function seededRandom(seed) {
+  let s = seed;
+  return () => {
+    s = (s * 16807) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
 }
 
-/* ------------------------------------------------------------------ *
- *  Armillary — two tilted precision rings with cyan / lime accents.
- * ------------------------------------------------------------------ */
-function Armillary({ shared }) {
-  const a = useRef();
-  const b = useRef();
-
-  useFrame((state, delta) => {
-    const reduced = shared.current.reduced;
-    if (a.current) a.current.rotation.z += delta * (reduced ? 0 : 0.11);
-    if (b.current) b.current.rotation.x += delta * (reduced ? 0 : 0.08);
-  });
-
-  return (
-    <group>
-      <group ref={a} rotation={[Math.PI / 2.55, 0, 0]}>
-        <mesh>
-          <torusGeometry args={[2.55, 0.012, 8, 128]} />
-          <meshStandardMaterial
-            color="#00e5d4"
-            emissive="#00e5d4"
-            emissiveIntensity={1.1}
-            metalness={0.55}
-            roughness={0.3}
-            transparent
-            opacity={0.75}
-          />
-        </mesh>
-      </group>
-      <group ref={b} rotation={[-Math.PI / 3.1, 0.4, Math.PI / 5]}>
-        <mesh>
-          <torusGeometry args={[3.05, 0.009, 8, 128]} />
-          <meshStandardMaterial
-            color="#b9f36b"
-            emissive="#b9f36b"
-            emissiveIntensity={0.55}
-            metalness={0.55}
-            roughness={0.3}
-            transparent
-            opacity={0.5}
-          />
-        </mesh>
-      </group>
-    </group>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- *  Satellites — small orbiting solids on independent inclinations.
- * ------------------------------------------------------------------ */
-function Satellites({ shared }) {
-  const group = useRef();
-
-  const configs = useMemo(() => {
-    const radii = [2.78, 3.08, 2.92, 3.22, 2.86, 3.16];
-    return radii.map((r, i) => ({
-      r,
-      speed: (i % 2 === 0 ? 1 : -1) * (0.26 + (i % 3) * 0.05),
-      tilt: (i / radii.length) * Math.PI,
-      phase: (i / radii.length) * Math.PI * 2,
-      size: 0.075 + (i % 3) * 0.02,
-      kind: i % 2 === 0 ? 'octa' : 'tetra',
-    }));
-  }, []);
-
-  useFrame((state, delta) => {
-    if (!group.current || shared.current.reduced) return;
-    const t = state.clock.elapsedTime;
-    group.current.children.forEach((mesh, i) => {
-      const c = configs[i];
-      const a = c.phase + t * c.speed;
-      mesh.position.set(
-        Math.cos(a) * c.r,
-        Math.sin(a) * c.r * Math.sin(c.tilt) * 0.55,
-        Math.sin(a) * c.r * Math.cos(c.tilt)
-      );
-      mesh.rotation.x += delta * 1.1;
-      mesh.rotation.y += delta * 0.8;
-    });
-  });
-
-  return (
-    <group ref={group}>
-      {configs.map((c, i) => (
-        <mesh key={i}>
-          {c.kind === 'octa' ? (
-            <octahedronGeometry args={[c.size, 0]} />
-          ) : (
-            <tetrahedronGeometry args={[c.size, 0]} />
-          )}
-          <meshStandardMaterial
-            color={i % 3 === 0 ? '#00e5d4' : '#e6fbf6'}
-            emissive={i % 3 === 0 ? '#00e5d4' : '#1b2430'}
-            emissiveIntensity={1.25}
-            metalness={0.7}
-            roughness={0.25}
-            flatShading
-          />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- *  OuterShell — a whisper-thin glass-like envelope for depth.
- * ------------------------------------------------------------------ */
-function OuterShell() {
-  const geo = useMemo(() => new THREE.IcosahedronGeometry(2.15, 1), []);
-  return (
-    <mesh geometry={geo}>
-      <meshStandardMaterial
-        color="#0a1a22"
-        metalness={0.1}
-        roughness={0.05}
-        transparent
-        opacity={0.06}
-        depthWrite={false}
-        side={THREE.DoubleSide}
-      />
-    </mesh>
-  );
-}
-
-/* ------------------------------------------------------------------ *
- *  HeroArtifact — root group: pointer parallax, drag inertia,
- *  hover response, scroll-driven departure, entrance + reduced motion.
- * ------------------------------------------------------------------ */
 export function HeroArtifact({ shared, reducedMotion }) {
   const root = useRef();
-
+  const coreRef = useRef();
+  const bandsRef = useRef([]);
+  const particlesRef = useRef();
+  
   const local = useRef({ reduced: false, dx: 0, dy: 0 });
-
+  
   useEffect(() => {
     local.current.reduced = reducedMotion;
   }, [reducedMotion]);
-
-  useFrame((state) => {
+  
+  const solidGeo = useMemo(() => createHeroGeometry(), []);
+  const coreGeo = useMemo(() => new THREE.IcosahedronGeometry(0.6, 1), []);
+  
+  const particleGeo = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    const count = 800;
+    const positions = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
+    const colors = new Float32Array(count * 3);
+    const offsets = new Float32Array(count * 3);
+    
+    const rand = seededRandom(42);
+    
+    for (let i = 0; i < count; i++) {
+      const radius = 2 + rand() * 3;
+      const theta = rand() * Math.PI * 2;
+      const phi = Math.acos(2 * rand() - 1);
+      
+      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = radius * Math.cos(phi);
+      
+      sizes[i] = rand() * 0.04 + 0.01;
+      
+      const colorChoice = rand();
+      if (colorChoice < 0.33) {
+        colors[i * 3] = 117/255; colors[i * 3 + 1] = 71/255; colors[i * 3 + 2] = 232/255;
+      } else if (colorChoice < 0.66) {
+        colors[i * 3] = 49/255; colors[i * 3 + 1] = 91/255; colors[i * 3 + 2] = 255/255;
+      } else {
+        colors[i * 3] = 39/255; colors[i * 3 + 1] = 220/255; colors[i * 3 + 2] = 203/255;
+      }
+      
+      offsets[i * 3] = rand() * Math.PI * 2;
+      offsets[i * 3 + 1] = rand() * 0.5 + 0.3;
+      offsets[i * 3 + 2] = rand() * 0.02 + 0.01;
+    }
+    
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    geo.setAttribute('offset', new THREE.BufferAttribute(offsets, 3));
+    return geo;
+  }, []);
+  
+  const particleMat = useMemo(() => new THREE.PointsMaterial({
+    size: 0.05,
+    vertexColors: true,
+    transparent: true,
+    opacity: 0.6,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    sizeAttenuation: true,
+  }), []);
+  
+  useFrame((state, delta) => {
     const r = root.current;
+    const c = coreRef.current;
+    const p = particlesRef.current;
     if (!r) return;
+    
     const s = { ...shared.current, reduced: local.current.reduced };
     const t = state.clock.elapsedTime;
     const reduced = s.reduced;
-
-    const entrance = reduced ? 1 : easeOutExpo(Math.min(1, t / 1.6));
-
+    
+    const entrance = reduced ? 1 : (t >= 1.6 ? 1 : 1 - Math.pow(2, -10 * t / 1.6));
+    
     const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    const progress = clamp01(window.scrollY / max);
-    const leave = smoothstep(0.02, 0.2, progress);
-
+    const progress = Math.min(1, Math.max(0, window.scrollY / max));
+    const leave = progress < 0.02 ? 0 : (progress > 0.2 ? 1 : (progress - 0.02) / 0.18 * (3 - 2 * (progress - 0.02) / 0.18));
+    
     if (!s.dragging && !reduced) {
       local.current.dx *= 0.94;
       local.current.dy *= 0.94;
     }
-
-    const targetX = (reduced ? 0 : shared.current.px * 0.45) + (reduced ? 0 : local.current.dx);
-    const targetY = (reduced ? 0 : shared.current.py * -0.3) + (reduced ? 0 : local.current.dy);
-
-    r.rotation.y += (targetX + t * (reduced ? 0 : 0.05) - r.rotation.y) * 0.06;
-    r.rotation.x += (targetY + Math.sin(t * 0.3) * 0.03 - r.rotation.x) * 0.06;
-
-    const baseScale = 0.6 + entrance * 0.4;
-    r.scale.setScalar(baseScale * (s.hover ? 1.05 : 1) * (1 - leave * 0.45));
-
-    r.position.y = (1 - entrance) * 1.5 + Math.sin(t * 0.6) * (reduced ? 0 : 0.07) + leave * 5;
-    r.position.x = leave * 6;
-    r.position.z = -leave * 6;
-    r.visible = leave < 0.985;
+    
+    const targetX = (reduced ? 0 : shared.current.px * 0.5) + (reduced ? 0 : local.current.dx);
+    const targetY = (reduced ? 0 : shared.current.py * -0.35) + (reduced ? 0 : local.current.dy);
+    
+    r.rotation.y += (targetX + t * (reduced ? 0 : 0.04) - r.rotation.y) * 0.05;
+    r.rotation.x += (targetY + Math.sin(t * 0.25) * 0.04 - r.rotation.x) * 0.05;
+    
+    const baseScale = 0.5 + entrance * 0.5;
+    r.scale.setScalar(baseScale * (s.hover ? 1.08 : 1) * (1 - leave * 0.5));
+    
+    r.position.y = (1 - entrance) * 2 + Math.sin(t * 0.5) * (reduced ? 0 : 0.08) + leave * 6;
+    r.position.x = leave * 8;
+    r.position.z = -leave * 8;
+    r.visible = leave < 0.99;
+    
+    if (c && !reduced) {
+      c.rotation.y += delta * 0.4;
+      c.rotation.x += delta * 0.2;
+      c.scale.setScalar(1 + Math.sin(t * 2) * 0.05);
+      c.material.emissiveIntensity = 0.6 + Math.sin(t * 2.5) * 0.2;
+    }
+    
+    bandsRef.current.forEach((band, i) => {
+      if (band && !reduced) {
+        band.rotation.y += delta * (0.02 + i * 0.01);
+        band.rotation.x += delta * (0.01 + i * 0.005);
+        band.material.emissiveIntensity = band.userData.baseEmissive + Math.sin(t * 1.5 + i) * 0.25;
+      }
+    });
+    
+    if (p && !reduced) {
+      p.rotation.y += delta * 0.01;
+      const posArray = p.geometry.attributes.position.array;
+      const offsets = p.geometry.attributes.offset.array;
+      
+      for (let i = 0; i < posArray.length / 3; i++) {
+        const off = offsets[i * 3];
+        const speed = offsets[i * 3 + 1];
+        const amp = offsets[i * 3 + 2];
+        
+        posArray[i * 3] += Math.sin(t * speed + off) * amp * 0.5;
+        posArray[i * 3 + 1] += Math.cos(t * speed + off) * amp * 0.3;
+        posArray[i * 3 + 2] += Math.sin(t * speed * 0.7 + off) * amp * 0.4;
+      }
+      p.geometry.attributes.position.needsUpdate = true;
+    }
   });
-
+  
   return (
     <group ref={root}>
-      <StellaCore shared={shared} />
-      <LatticeCage shared={shared} />
-      <Armillary shared={shared} />
-      <Satellites shared={shared} />
-      <OuterShell />
+      <mesh
+        ref={coreRef}
+        geometry={coreGeo}
+        material={new THREE.MeshStandardMaterial({
+          color: '#05060b',
+          metalness: 0.98,
+          roughness: 0.08,
+          emissive: '#7547e8',
+          emissiveIntensity: 0.6,
+          flatShading: true,
+        })}
+        castShadow
+        receiveShadow
+      />
+      <pointLight position={[0, 0, 0]} intensity={15} distance={15} decay={2} color="#7547e8" />
+      
+      <group>
+        {[
+          { rot: [0, 0, 0], color: '#7547e8', emissive: 0.4 },
+          { rot: [0.5, 0.8, 0.2], color: '#315bff', emissive: 0.35 },
+          { rot: [1.0, 0.3, 0.7], color: '#27dccb', emissive: 0.3 },
+        ].map((config, i) => (
+          <mesh
+            key={i}
+            ref={(el) => { if (el) bandsRef.current.push(el); }}
+            geometry={solidGeo}
+            material={new THREE.MeshStandardMaterial({
+              color: '#0a0a15',
+              metalness: 0.95,
+              roughness: 0.15,
+              emissive: config.color,
+              emissiveIntensity: config.emissive,
+              side: THREE.DoubleSide,
+            })}
+            rotation={config.rot}
+            userData={{ baseEmissive: config.emissive }}
+            castShadow
+            receiveShadow
+          />
+        ))}
+      </group>
+      
+      <points
+        ref={particlesRef}
+        geometry={particleGeo}
+        material={particleMat}
+      />
+      
+      <mesh
+        geometry={new THREE.SphereGeometry(3.5, 32, 32)}
+        material={new THREE.MeshStandardMaterial({
+          color: '#05060b',
+          metalness: 0.1,
+          roughness: 0.9,
+          transparent: true,
+          opacity: 0.03,
+          side: THREE.BackSide,
+          depthWrite: false,
+        })}
+      />
     </group>
   );
 }

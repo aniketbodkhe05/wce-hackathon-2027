@@ -26,19 +26,22 @@ export function Highlights() {
         <div className="relative grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {eventData.highlights.map((item, i) => (
             <Reveal key={item.code} delay={i * 0.06} y={24}>
-              <article className="group relative h-full border hairline p-7 sm:p-8 hover:bg-white/[0.015] transition-colors duration-500">
-                <div className="absolute top-6 right-6 w-12 h-12 rounded-sm bg-white/[0.02] border hairline flex items-center justify-center group-hover:bg-[#7547e8]/10 transition-colors">
-                  <span className="font-mono text-[10px] text-[#7547e8]">{item.code}</span>
+              <article className="group relative h-full border hairline rounded-sm overflow-hidden transition-all duration-500 hover:-translate-y-1">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#7547e8]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="relative z-10 p-7 sm:p-8">
+                  <div className="flex items-start justify-between gap-4 mb-5">
+                    <span className="font-mono text-[10px] text-[#7547e8] tracking-[0.16em] uppercase shrink-0">
+                      {item.metric}
+                    </span>
+                    <div className="w-12 h-12 rounded-sm bg-white/[0.02] border hairline flex items-center justify-center group-hover:bg-[#7547e8]/10 group-hover:border-[#7547e8]/50 transition-colors duration-500 shrink-0">
+                      <span className="font-mono text-[10px] text-[#7547e8]">{item.code}</span>
+                    </div>
+                  </div>
+                  <h3 className="font-display font-semibold text-xl sm:text-[1.35rem] text-[#f2f5f7] leading-snug group-hover:text-[#7547e8] transition-colors duration-500 pr-12">
+                    {item.title}
+                  </h3>
                 </div>
-                <div className="mb-6 relative z-10">
-                  <span className="font-mono text-[10px] text-[#7547e8] tracking-[0.16em] uppercase">
-                    {item.metric}
-                  </span>
-                </div>
-                <h3 className="font-display font-semibold text-xl sm:text-[1.35rem] text-[#f2f5f7] leading-snug group-hover:text-[#7547e8] transition-colors duration-500 relative z-10">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-[#929caa] leading-relaxed mt-3 relative z-10 line-clamp-2">{item.description}</p>
+                <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7547e8]/30 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
               </article>
             </Reveal>
           ))}

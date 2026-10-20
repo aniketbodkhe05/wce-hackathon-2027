@@ -2,10 +2,10 @@ import { eventData } from '../data/event';
 import { Reveal } from '../components/Reveal';
 
 const stats = [
-  { value: '24', unit: 'HRS', label: 'Continuous build sprint' },
-  { value: '02', unit: 'TRACKS', label: 'Novice & expert calibrated' },
-  { value: '09', unit: 'MISSIONS', label: 'Across dual difficulty tiers' },
-  { value: '₹400', unit: '/TEAM', label: 'Round 1 online entry free' },
+  { value: '24', unit: 'HRS', label: 'Non-stop build sprint' },
+  { value: '02', unit: 'TRACKS', label: 'Novice & Expert' },
+  { value: '09', unit: 'MISSIONS', label: 'Across both tiers' },
+  { value: '₹0', unit: 'ROUND 1', label: 'Free entry' },
 ];
 
 export function About() {
@@ -18,6 +18,10 @@ export function About() {
       <div
         aria-hidden="true"
         className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(117,71,232,0.06),transparent_55%)]"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(49,91,255,0.04),transparent_60%)]"
       />
 
       <div className="container-custom relative z-10">
@@ -49,14 +53,14 @@ export function About() {
 
               <Reveal delay={0.24}>
                 <div className="mt-10 flex flex-wrap items-center gap-4">
-                  <div className="flex items-center gap-3 px-4 py-3 panel-line rounded-sm">
+                  <div className="flex items-center gap-3 px-4 py-3 panel-line rounded-sm group hover:border-[#7547e8]/50 transition-colors">
                     <img src="/logos/wce-logo.svg" alt="WCE Sangli" className="w-8 h-8 object-contain" />
                     <div className="font-mono text-[10px] leading-tight">
                       <div className="text-white font-semibold tracking-wider">WCE SANGLI</div>
                       <div className="text-[#5c6673] tracking-[0.18em]">EST. 1947</div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 px-4 py-3 panel-line rounded-sm">
+                  <div className="flex items-center gap-3 px-4 py-3 panel-line rounded-sm group hover:border-[#7547e8]/50 transition-colors">
                     <img
                       src="/logos/acm-logo.png"
                       alt="WCE ACM Student Chapter"
@@ -76,14 +80,18 @@ export function About() {
             <div className="grid grid-cols-2 gap-4">
               {stats.map((s, i) => (
                 <Reveal key={s.label} delay={0.1 + i * 0.08} y={24}>
-                  <div className="tech-corners glass-panel p-6 sm:p-7 h-full rounded-sm group">
-                    <div className="font-display font-semibold text-4xl sm:text-5xl text-white group-hover:text-[#7547e8] transition-colors duration-500">
-                      {s.value}
+                  <div className="relative tech-corners glass-panel p-6 sm:p-7 h-full rounded-sm group overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#7547e8]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative z-10">
+                      <div className="font-display font-semibold text-4xl sm:text-5xl text-white group-hover:text-[#7547e8] transition-colors duration-500">
+                        {s.value}
+                      </div>
+                      <div className="font-mono text-[10px] text-[#7547e8] tracking-[0.22em] mt-1">
+                        {s.unit}
+                      </div>
+                      <div className="text-xs text-[#5c6673] leading-relaxed mt-3">{s.label}</div>
                     </div>
-                    <div className="font-mono text-[10px] text-[#7547e8] tracking-[0.22em] mt-1">
-                      {s.unit}
-                    </div>
-                    <div className="text-xs text-[#5c6673] leading-relaxed mt-3">{s.label}</div>
+                    <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7547e8]/30 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                   </div>
                 </Reveal>
               ))}

@@ -4,11 +4,11 @@ import { eventData } from '../data/event';
 import { SectionHeading } from '../components/SectionTag';
 import { Reveal } from '../components/Reveal';
 import { EASE_OUT_EXPO } from '../lib/easing';
-import { ArrowUpRight, CircleDot, Terminal } from 'lucide-react';
+import { ArrowUpRight, Terminal } from 'lucide-react';
 
 const tracks = [
-  { id: 'novice', name: 'Novice', code: 'TRK-A', audience: '1st & 2nd Year Engineers' },
-  { id: 'expert', name: 'Expert', code: 'TRK-B', audience: '3rd & 4th Year + Research Grade' },
+  { id: 'novice', name: 'Novice', code: 'TRK-A', audience: '1st & 2nd Year' },
+  { id: 'expert', name: 'Expert', code: 'TRK-B', audience: '3rd & 4th Year+' },
 ];
 
 function DomainArtifact() {
@@ -92,6 +92,7 @@ export function Challenges() {
                       <div className="font-mono text-[10px] text-[#5c6673] tracking-[0.14em] mt-1 uppercase">
                         {t.audience}
                       </div>
+                      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7547e8]/30 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                     </button>
                   );
                 })}
@@ -110,53 +111,43 @@ export function Challenges() {
                 {missions.map((m, i) => (
                   <article
                     key={m.id}
-                    className="tech-corners glass-panel rounded-sm p-6 sm:p-7 flex flex-col group hover:-translate-y-1.5 transition-transform duration-500"
+                    className="relative tech-corners glass-panel rounded-sm p-6 sm:p-7 flex flex-col group hover:-translate-y-1.5 transition-transform duration-500 overflow-hidden"
                     style={{ transitionDelay: `${i * 20}ms` }}
                   >
-                    <div className="flex items-center justify-between mb-5">
-                      <span className="font-mono text-[10px] text-[#7547e8] tracking-[0.2em]">
-                        M.SN // 0{i + 1}
-                      </span>
-                      <div className="flex gap-1.5">
-                        {m.tags.slice(0, 2).map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-2 py-0.5 font-mono text-[9px] tracking-wider text-[#929caa] bg-white/[0.04] border hairline rounded-sm uppercase"
-                          >
-                            {tag}
-                          </span>
-                        ))}
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#7547e8]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-5">
+                        <span className="font-mono text-[10px] text-[#7547e8] tracking-[0.2em]">
+                          M.SN // 0{i + 1}
+                        </span>
+                        <div className="flex gap-1.5">
+                          {m.tags.slice(0, 2).map((tag) => (
+                            <span
+                              key={tag}
+                              className="px-2 py-0.5 font-mono text-[9px] tracking-wider text-[#929caa] bg-white/[0.04] border hairline rounded-sm uppercase"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <h3 className="font-display font-semibold text-xl sm:text-2xl text-[#f2f5f7] group-hover:text-[#7547e8] transition-colors duration-500 leading-tight pr-8">
+                        {m.title}
+                      </h3>
+                      <p className="font-mono text-[11px] text-[#7547e8] tracking-wide mt-2 flex items-center gap-2">
+                        <Terminal className="w-3 h-3 shrink-0" />
+                        {m.tagline}
+                      </p>
+
+                      <div className="mt-6 pt-4 border-t hairline flex items-center justify-between">
+                        <span className="font-mono text-[10px] tracking-[0.2em] text-[#5c6673] uppercase">
+                          Brief // 2027
+                        </span>
+                        <ArrowUpRight className="w-4 h-4 text-[#7547e8] opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-500" />
                       </div>
                     </div>
-
-                    <h3 className="font-display font-semibold text-xl sm:text-2xl text-[#f2f5f7] group-hover:text-[#7547e8] transition-colors duration-500 leading-tight">
-                      {m.title}
-                    </h3>
-                    <p className="font-mono text-[11px] text-[#7547e8] tracking-wide mt-2 flex items-center gap-2">
-                      <Terminal className="w-3 h-3 shrink-0" />
-                      {m.tagline}
-                    </p>
-                    <p className="text-sm text-[#929caa] leading-relaxed mt-4 flex-1 line-clamp-2">
-                      {m.description}
-                    </p>
-
-                    {(m.deliverables || m.sampleIdeas) && (
-                      <div className="mt-6 pt-4 border-t hairline space-y-2">
-                        {(m.deliverables || m.sampleIdeas).slice(0, 3).map((item, idx) => (
-                          <div key={idx} className="flex items-start gap-2.5 text-xs text-[#c7cfd9]">
-                            <CircleDot className="w-3 h-3 text-[#7547e8] shrink-0 mt-0.5" />
-                            <span>{item}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="mt-6 pt-4 border-t hairline flex items-center justify-between">
-                      <span className="font-mono text-[10px] tracking-[0.2em] text-[#5c6673] uppercase">
-                        Brief // 2027
-                      </span>
-                      <ArrowUpRight className="w-4 h-4 text-[#7547e8] opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-500" />
-                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7547e8]/30 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                   </article>
                 ))}
               </motion.div>

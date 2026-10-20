@@ -2,356 +2,476 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-const UP = new THREE.Vector3(0, 1, 0);
+function createBandGeometry(width, height, depth, segments = 8) {
+  const geo = new THREE.BoxGeometry(width, height, depth, segments, segments, segments);
+  const positions = geo.attributes.position;
+  const newPositions = new Float32Array(positions.count * 3);
+  
+  for (let i = 0; i < positions.count; i++) {
+    const x = positions.getX(i);
+    const y = positions.getY(i);
+    const z = positions.getZ(i);
+    
+    const distFromCenter = Math.sqrt(x * x + z * z);
+    const wave = Math.sin(distFromCenter * 8 + y * 4) * 0.02;
+    const twist = Math.atan2(z, x) * 0.1;
+    
+    newPositions[i * 3] = x + Math.cos(twist) * wave;
+    newPositions[i * 3 + 1] = y + wave * 0.5;
+    newPositions[i * 3 + 2] = z + Math.sin(twist) * wave;
+  }
+  
+  geo.setAttribute('position', new THREE.BufferAttribute(newPositions, 3));
+  geo.computeVertexNormals();
+  return geo;
+}
 
-function Beam({
-  from,
-  to,
-  width = 0.1,
-  depth = 0.1,
-  color = '#3b4560',
-  metalness = 0.92,
-  roughness = 0.26,
-  emissive = '#000000',
-  emissiveIntensity = 0,
-}) {
-  const { position, quaternion, length } = useMemo(() => {
-    const a = new THREE.Vector3(...from);
-    const b = new THREE.Vector3(...to);
-    const dir = new THREE.Vector3().subVectors(b, a);
-    const len = Math.max(dir.length(), 0.0001);
-    const mid = new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5);
-    const quat = new THREE.Quaternion().setFromUnitVectors(UP, dir.clone().normalize());
-    return { position: mid.toArray(), quaternion: quat, length: len };
-  }, [from, to]);
+function createTwistedTorus(radius, tube, radialSegments, tubularSegments, twists = 1) {
+  const geo = new THREE.TorusGeometry(radius, tube, radialSegments, tubularSegments);
+  const positions = geo.attributes.position;
+  const newPositions = new Float32Array(positions.count * 3);
+  
+  for (let i = 0; i < positions.count; i++) {
+    const x = positions.getX(i);
+    const y = positions.getY(i);
+    const z = positions.getZ(i);
+    
+    const angle = Math.atan2(y, x);
+    const twistAmount = angle * twists;
+    const cos = Math.cos(twistAmount);
+    const sin = Math.sin(twistAmount);
+    
+    newPositions[i * 3] = x * cos - z * sin;
+    newPositions[i * 3 + 1] = y;
+    newPositions[i * 3 + 2] = x * sin + z * cos;
+  }
+  
+  geo.setAttribute('position', new THREE.BufferAttribute(newPositions, 3));
+  geo.computeVertexNormals();
+  return geo;
+}
 
+function createMobiusStrip(radius, width, segments, twists = 1) {
+  const geo = new THREE.BufferGeometry();
+  const positions = [];
+  const normals = [];
+  const uvs = [];
+  const indices = [];
+  
+  for (let i = 0; i <= segments; i++) {
+    const u = i / segments;
+    const angle = u * Math.PI * 2;
+    
+    for (let j = 0; j <= 4; j++) {
+      const v = (j - 2) / 2 * width;
+      const twist = angle * twists * 0.5;
+      
+      const cosA = Math.cos(angle);
+      const sinA = Math.sin(angle);
+      const cosT = Math.cos(twist);
+      const sinT = Math.sin(twist);
+      
+      const x = (radius + v * cosT) * cosA;
+      const y = (radius + v * cosT) * sinA;
+      const z = v * sinT;
+      
+      positions.push(x, y, z);
+      uvs.push(u, j / 4);
+      
+      const nx = cosA * cosT;
+      const ny = sinA * cosT;
+      const nz = sinT;
+      normals.push(nx, ny, nz);
+    }
+  }
+  
+  for (let i = 0; i < segments; i++) {
+    for (let j = 0; j < 4; j++) {
+      const a = i * 5 + j;
+      const b = i * 5 + j + 1;
+      const c = ((i + 1) % (segments + 1)) * 5 + j;
+      const d = ((i + 1) % (segments + 1)) * 5 + j + 1;
+      
+      indices.push(a, b, d);
+      indices.push(d, c, a);
+    }
+  }
+  
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+function ThickTorusRing({ radius, tube, color, emissive, emissiveIntensity, rotation, ...props }) {
+  const geo = useMemo(() => new THREE.TorusGeometry(radius, tube, 32, 128), [radius, tube]);
+  const mat = useMemo(() => new THREE.MeshStandardMaterial({
+    color,
+    metalness: 0.95,
+    roughness: 0.15,
+    emissive,
+    emissiveIntensity,
+  }), [color, emissive, emissiveIntensity]);
+  
   return (
-    <mesh position={position} quaternion={quaternion} castShadow>
-      <boxGeometry args={[width, length, depth]} />
-      <meshStandardMaterial
-        color={color}
-        metalness={metalness}
-        roughness={roughness}
-        emissive={emissive}
-        emissiveIntensity={emissiveIntensity}
-      />
-    </mesh>
+    <mesh
+      geometry={geo}
+      material={mat}
+      rotation={rotation}
+      castShadow
+      receiveShadow
+      {...props}
+    />
   );
 }
 
-function RectFrame({ w, h, thickness = 0.12, accent = '#27dccb', accentEdges = [] }) {
-  const cx = w / 2;
-  const cy = h / 2;
-  const p = [
-    [-cx, -cy],
-    [cx, -cy],
-    [cx, cy],
-    [-cx, cy],
-  ];
+function InterlockingRings() {
+  const ringGeo = useMemo(() => createTwistedTorus(2.5, 0.15, 16, 64, 2), []);
+  const material1 = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#1a1a2e',
+    metalness: 0.9,
+    roughness: 0.2,
+    emissive: '#7547e8',
+    emissiveIntensity: 0.3,
+    side: THREE.DoubleSide,
+  }), []);
+  const material2 = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#1a1a2e',
+    metalness: 0.9,
+    roughness: 0.2,
+    emissive: '#315bff',
+    emissiveIntensity: 0.3,
+    side: THREE.DoubleSide,
+  }), []);
+  const material3 = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#1a1a2e',
+    metalness: 0.9,
+    roughness: 0.2,
+    emissive: '#27dccb',
+    emissiveIntensity: 0.3,
+    side: THREE.DoubleSide,
+  }), []);
+  
   return (
     <group>
-      {p.map((a, i) => {
-        const b = p[(i + 1) % p.length];
-        const isAccent = accentEdges.includes(i);
-        return (
-          <Beam
-            key={i}
-            from={[a[0], a[1], 0]}
-            to={[b[0], b[1], 0]}
-            width={isAccent ? thickness * 0.7 : thickness}
-            depth={isAccent ? thickness * 0.7 : thickness}
-            color={isAccent ? '#2c3448' : '#242c3d'}
-            emissive={isAccent ? accent : '#0b0f18'}
-            emissiveIntensity={isAccent ? 1.2 : 0}
-          />
-        );
-      })}
+      <mesh geometry={ringGeo} material={material1} rotation={[Math.PI / 2, 0, 0]} castShadow receiveShadow />
+      <mesh geometry={ringGeo} material={material2} rotation={[0, Math.PI / 2, 0]} castShadow receiveShadow />
+      <mesh geometry={ringGeo} material={material3} rotation={[0, 0, Math.PI / 2]} castShadow receiveShadow />
     </group>
   );
 }
 
-function TriFrame({ r = 1, thickness = 0.1, accent = '#7547e8', accentEdge = 0 }) {
-  const pts = [0, 1, 2].map((i) => {
-    const ang = (i / 3) * Math.PI * 2 - Math.PI / 2;
-    return [Math.cos(ang) * r, Math.sin(ang) * r, 0];
-  });
-  return (
-    <group>
-      {pts.map((a, i) => {
-        const b = pts[(i + 1) % 3];
-        return (
-          <Beam
-            key={i}
-            from={a}
-            to={b}
-            width={thickness}
-            depth={thickness}
-            color="#414c68"
-            emissive={i === accentEdge ? accent : '#0b0f18'}
-            emissiveIntensity={i === accentEdge ? 1.0 : 0}
-          />
-        );
-      })}
-    </group>
-  );
-}
-
-function HexFrame({ r = 1, thickness = 0.09, accent = '#315bff' }) {
-  const pts = [0, 1, 2, 3, 4, 5].map((i) => {
-    const ang = (i / 6) * Math.PI * 2;
-    return [Math.cos(ang) * r, Math.sin(ang) * r, 0];
-  });
-  return (
-    <group>
-      {pts.map((a, i) => {
-        const b = pts[(i + 1) % 6];
-        const isAccent = i % 2 === 0;
-        return (
-          <Beam
-            key={i}
-            from={a}
-            to={b}
-            width={isAccent ? thickness * 0.8 : thickness}
-            depth={isAccent ? thickness * 0.8 : thickness}
-            color={isAccent ? '#3b4560' : '#242c3d'}
-            emissive={isAccent ? accent : '#0b0f18'}
-            emissiveIntensity={isAccent ? 0.8 : 0}
-          />
-        );
-      })}
-    </group>
-  );
-}
-
-function Node({ position, size = 0.1, color = '#5c7cff', emissiveColor = '#315bff', intensity = 1.6 }) {
-  return (
-    <mesh position={position}>
-      <sphereGeometry args={[size, 16, 16]} />
-      <meshStandardMaterial color={color} emissive={emissiveColor} emissiveIntensity={intensity} metalness={0.9} roughness={0.2} />
-    </mesh>
-  );
-}
-
-/* MODEL A — Interlocked Core: Three interpenetrating rectangular frames with
-   diagonal cross-braces, triangular inserts, and a central compound node.
-   Impossible-looking connections, metallic depth, violet accents. */
 export function InterlockedCore({ accent = '#7547e8' }) {
   const root = useRef();
   const inner = useRef();
-
+  const bands = useRef([]);
+  
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
     if (root.current) {
-      root.current.rotation.y += delta * 0.065;
-      root.current.rotation.x = 0.1 + Math.sin(t * 0.14) * 0.06;
+      root.current.rotation.y += delta * 0.05;
+      root.current.rotation.x = 0.15 + Math.sin(t * 0.12) * 0.08;
     }
     if (inner.current) {
-      inner.current.rotation.z -= delta * 0.04;
-      inner.current.rotation.x += delta * 0.025;
+      inner.current.rotation.z -= delta * 0.03;
+      inner.current.rotation.x += delta * 0.02;
     }
+    bands.current.forEach((band, i) => {
+      if (band && band.userData.pulse) {
+        band.material.emissiveIntensity = band.userData.baseEmissive + Math.sin(t * 2 + i) * 0.3;
+      }
+    });
   });
-
+  
   return (
     <group ref={root}>
       <group ref={inner}>
-        <RectFrame w={3.5} h={2.5} thickness={0.15} accent={accent} accentEdges={[2]} />
-        <group rotation={[0.35, 1.15, 0.12]}>
-          <RectFrame w={2.7} h={3.3} thickness={0.14} accent="#315bff" accentEdges={[0]} />
+        <InterlockingRings />
+        
+        <group>
+          {[
+            { rot: [0, 0, 0.3], emissive: accent },
+            { rot: [0, 0, -0.3], emissive: '#315bff' },
+            { rot: [0.3, 0, 0], emissive: '#27dccb' },
+            { rot: [0, 0.3, 0], emissive: '#7547e8' },
+          ].map((b, i) => (
+            <group key={i} rotation={b.rot}>
+              <mesh
+                ref={(el) => { if (el) bands.current.push(el); }}
+                geometry={createBandGeometry(0.18, 8.5, 0.18, 16)}
+                material={new THREE.MeshStandardMaterial({
+                  color: '#1a1a2e',
+                  metalness: 0.95,
+                  roughness: 0.15,
+                  emissive: b.emissive,
+                  emissiveIntensity: 0.4,
+                })}
+                userData={{ pulse: true, baseEmissive: 0.4 }}
+                position={[0, 0, 0]}
+                castShadow
+                receiveShadow
+              />
+            </group>
+          ))}
         </group>
-        <group rotation={[1.02, 0.42, 0.62]}>
-          <RectFrame w={3.0} h={2.2} thickness={0.13} accent="#27dccb" accentEdges={[1, 3]} />
-        </group>
-
-        <Beam from={[-1.75, -1.25, 0]} to={[1.35, 1.65, 0.5]} width={0.09} depth={0.09} color="#4a5573" />
-        <Beam from={[1.75, 1.25, 0]} to={[-1.35, -1.65, -0.5]} width={0.09} depth={0.09} color="#4a5573" />
-        <Beam from={[-1.75, 1.25, 0]} to={[0.6, -1.7, 1.1]} width={0.08} depth={0.08} color="#444f6b" />
-        <Beam from={[1.75, -1.25, 0]} to={[-0.6, 1.7, -1.1]} width={0.08} depth={0.08} color="#444f6b" />
-        <Beam from={[-1.75, -1.25, 0]} to={[0, 0, 1.5]} width={0.07} depth={0.07} color="#5a6588" emissive={accent} emissiveIntensity={0.4} />
-        <Beam from={[1.75, 1.25, 0]} to={[0, 0, -1.5]} width={0.07} depth={0.07} color="#5a6588" emissive="#315bff" emissiveIntensity={0.4} />
-
-        <group position={[0, 0.1, 0.45]} rotation={[0.5, 0.3, 0]}>
-          <TriFrame r={0.85} thickness={0.09} accent={accent} accentEdge={0} />
-        </group>
-        <group position={[0.2, -0.35, -0.5]} rotation={[-0.6, 0.9, 0.2]}>
-          <TriFrame r={0.65} thickness={0.08} accent="#315bff" accentEdge={2} />
-        </group>
-        <group position={[-0.3, 0.5, -0.3]} rotation={[0.2, -0.7, 0.4]}>
-          <HexFrame r={0.55} thickness={0.07} accent="#27dccb" />
-        </group>
-
-        <mesh rotation={[0.3, 0.4, 0.2]}>
-          <octahedronGeometry args={[0.55, 0]} />
-          <meshStandardMaterial color="#2a3348" metalness={0.96} roughness={0.18} emissive="#1a1030" emissiveIntensity={0.7} />
-        </mesh>
-
+        
+        <mesh
+          geometry={new THREE.OctahedronGeometry(0.8, 1)}
+          material={new THREE.MeshStandardMaterial({
+            color: '#0d0d1a',
+            metalness: 0.98,
+            roughness: 0.1,
+            emissive: accent,
+            emissiveIntensity: 0.5,
+            flatShading: true,
+          })}
+          castShadow
+          receiveShadow
+        />
+        
         {[
-          [-1.75, -1.25, 0],
-          [1.75, 1.25, 0],
-          [-1.75, 1.25, 0],
-          [1.75, -1.25, 0],
-          [1.35, 1.65, 0.5],
-          [-1.35, -1.65, -0.5],
+          [3, 2, 0], [-3, -2, 0], [-3, 2, 0], [3, -2, 0],
+          [0, 3, 1], [0, -3, -1], [2, 0, 2], [-2, 0, -2]
         ].map((pos, i) => (
-          <Node key={i} position={pos} size={0.07} color="#7547e8" emissiveColor="#7547e8" intensity={1.8} />
+          <mesh
+            key={i}
+            position={pos}
+            geometry={new THREE.SphereGeometry(0.12, 16, 16)}
+            material={new THREE.MeshStandardMaterial({
+              color: i < 4 ? accent : '#315bff',
+              emissive: i < 4 ? accent : '#315bff',
+              emissiveIntensity: 2,
+              metalness: 0.9,
+              roughness: 0.1,
+            })}
+            castShadow
+          />
         ))}
       </group>
     </group>
   );
 }
 
-/* MODEL B — Architectural Frame: Stacked, offset rectangular scaffolds with
-   vertical columns, diagonal cross members, and a triangular crown.
-   Industrial metallic beams, electric blue accents, dimensional depth. */
 export function ArchitecturalFrame({ accent = '#315bff' }) {
   const root = useRef();
-
+  const floating = useRef();
+  
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
-    if (!root.current) return;
-    root.current.rotation.y -= delta * 0.045;
-    root.current.rotation.z = Math.sin(t * 0.1) * 0.04;
-    root.current.position.y = Math.sin(t * 0.2) * 0.15;
+    if (root.current) {
+      root.current.rotation.y -= delta * 0.035;
+      root.current.rotation.z = Math.sin(t * 0.08) * 0.03;
+    }
+    if (floating.current) {
+      floating.current.position.y = Math.sin(t * 0.5) * 0.3;
+      floating.current.rotation.y += delta * 0.1;
+    }
   });
-
+  
   return (
     <group ref={root}>
-      <group position={[0, -1.6, 0]} rotation={[0.15, 0.25, 0]}>
-        <RectFrame w={3.6} h={2.0} thickness={0.14} accent={accent} accentEdges={[2]} />
+      <group position={[0, -2, 0]} rotation={[0.2, 0.3, 0]}>
+        <ThickTorusRing radius={2.8} tube={0.18} color="#1a1a2e" emissive={accent} emissiveIntensity={0.4} rotation={[Math.PI / 2, 0, 0]} />
       </group>
-      <group position={[0, 0.1, 0.2]} rotation={[0.28, 0.85, 0.08]}>
-        <RectFrame w={2.7} h={2.4} thickness={0.13} accent="#27dccb" accentEdges={[0, 2]} />
+      
+      <group position={[0, 0.5, 0]} rotation={[0.3, 0.8, 0.1]}>
+        <ThickTorusRing radius={2.2} tube={0.16} color="#1a1a2e" emissive="#27dccb" emissiveIntensity={0.35} rotation={[Math.PI / 2, 0.2, 0]} />
       </group>
-      <group position={[0.15, 1.75, -0.1]} rotation={[-0.2, 1.4, 0.12]}>
-        <RectFrame w={2.0} h={1.7} thickness={0.12} accent="#7547e8" accentEdges={[1]} />
+      
+      <group position={[0, 2.5, 0]} rotation={[-0.15, 1.3, 0.05]}>
+        <ThickTorusRing radius={1.6} tube={0.14} color="#1a1a2e" emissive="#7547e8" emissiveIntensity={0.3} rotation={[Math.PI / 2, 0.4, 0]} />
       </group>
-
-      {[-1.5, 1.5].map((x, i) => (
-        <Beam
-          key={`c${i}`}
-          from={[x, -1.6, i === 0 ? -0.5 : 0.5]}
-          to={[x * 0.55, 1.9, i === 0 ? 0.3 : -0.3]}
-          width={0.1}
-          depth={0.1}
-          color="#46506b"
+      
+      <group ref={floating} position={[0, 4.2, 0]}>
+        <mesh
+          geometry={new THREE.IcosahedronGeometry(0.5, 1)}
+          material={new THREE.MeshStandardMaterial({
+            color: '#0d0d1a',
+            metalness: 0.98,
+            roughness: 0.08,
+            emissive: '#27dccb',
+            emissiveIntensity: 0.4,
+            flatShading: true,
+          })}
+          castShadow
+          receiveShadow
+        />
+      </group>
+      
+      {[
+        [-2.8, -2, 0], [2.8, -2, 0], [-2.2, 0.5, 0], [2.2, 0.5, 0],
+        [-1.6, 2.5, 0], [1.6, 2.5, 0]
+      ].map((pos, i) => (
+        <mesh
+          key={i}
+          position={pos}
+          geometry={new THREE.CylinderGeometry(0.08, 0.08, 5.5, 8, 1, true)}
+          material={new THREE.MeshStandardMaterial({
+            color: '#1a1a2e',
+            metalness: 0.95,
+            roughness: 0.15,
+            emissive: i % 3 === 0 ? accent : (i % 3 === 1 ? '#27dccb' : '#7547e8'),
+            emissiveIntensity: 0.5,
+          })}
+          rotation={[Math.PI / 2, 0, i % 2 === 0 ? 0.3 : -0.3]}
+          castShadow
+          receiveShadow
         />
       ))}
-
-      <Beam from={[-1.7, -1.6, 0.2]} to={[1.2, 1.4, -0.5]} width={0.075} depth={0.075} color="#4c5776" />
-      <Beam from={[1.7, -0.6, -0.2]} to={[-1.0, 2.0, 0.4]} width={0.075} depth={0.075} color="#4c5776" />
-      <Beam from={[-1.3, 2.1, 0]} to={[1.3, 2.6, -0.2]} width={0.11} depth={0.11} color="#46506b" emissive="#27dccb" emissiveIntensity={0.9} />
-
-      <group position={[0, 2.85, 0]} rotation={[0, 0.4, 0]}>
-        <TriFrame r={0.75} thickness={0.09} accent="#27dccb" accentEdge={0} />
-      </group>
-
+      
       {[
-        [-1.8, -1.0, 0.2],
-        [1.8, -1.0, 0.2],
-        [-1.35, 1.2, -0.4],
-        [1.35, 1.2, -0.4],
-        [0, 2.85, 0],
-      ].map((pos, i) => (
-        <Node key={i} position={pos} size={0.06} color="#315bff" emissiveColor="#315bff" intensity={1.7} />
+        { from: [-2.8, -2, 0], to: [0, 2.5, 0] },
+        { from: [2.8, -2, 0], to: [0, 2.5, 0] },
+        { from: [-2.2, 0.5, 0], to: [1.6, 2.5, 0] },
+        { from: [2.2, 0.5, 0], to: [-1.6, 2.5, 0] },
+      ].map((b, i) => (
+        <mesh
+          key={i}
+          geometry={createBandGeometry(0.12, 5, 0.12, 12)}
+          material={new THREE.MeshStandardMaterial({
+            color: '#1a1a2e',
+            metalness: 0.95,
+            roughness: 0.15,
+            emissive: i < 2 ? accent : '#27dccb',
+            emissiveIntensity: 0.35,
+          })}
+          position={[
+            (b.from[0] + b.to[0]) / 2,
+            (b.from[1] + b.to[1]) / 2,
+            (b.from[2] + b.to[2]) / 2
+          ]}
+          rotation={[
+            0,
+            0,
+            Math.atan2(b.to[1] - b.from[1], b.to[0] - b.from[0])
+          ]}
+          castShadow
+          receiveShadow
+        />
       ))}
-
-      <group position={[0, -0.8, 0]} rotation={[0, 0, 0]}>
-        <HexFrame r={1.4} thickness={0.08} accent="#315bff" />
-      </group>
     </group>
   );
 }
 
-/* MODEL C — Orbital Geometry: Intersecting toroidal rings with an inner
-   angular cage, polygonal frame, and orbiting nodes. Unusual silhouette,
-   turquoise and lime accents, complex depth. */
-export function OrbitalGeometry() {
+export function OrbitalGeometry({ accent = '#27dccb' }) {
   const root = useRef();
-  const ringA = useRef();
-  const ringB = useRef();
-  const ringC = useRef();
-  const cageRef = useRef();
-
+  const rings = useRef([]);
+  const cage = useRef();
+  const orbitals = useRef([]);
+  
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
     if (root.current) {
-      root.current.rotation.y += delta * 0.05;
-      root.current.rotation.x = Math.sin(t * 0.12) * 0.1;
-      root.current.position.y = Math.sin(t * 0.18 + 1) * 0.18;
+      root.current.rotation.y += delta * 0.025;
+      root.current.rotation.x = Math.sin(t * 0.1) * 0.08;
+      root.current.position.y = Math.sin(t * 0.15) * 0.2;
     }
-    if (ringA.current) ringA.current.rotation.z += delta * 0.1;
-    if (ringB.current) ringB.current.rotation.x += delta * 0.08;
-    if (ringC.current) ringC.current.rotation.y -= delta * 0.065;
-    if (cageRef.current) {
-      cageRef.current.rotation.y += delta * 0.03;
-      cageRef.current.rotation.x += delta * 0.02;
+    rings.current.forEach((ring, i) => {
+      if (ring) {
+        ring.rotation.z += delta * (0.05 + i * 0.02);
+        ring.rotation.x += delta * (0.02 + i * 0.01);
+      }
+    });
+    if (cage.current) {
+      cage.current.rotation.y += delta * 0.02;
+      cage.current.rotation.x += delta * 0.015;
     }
+    orbitals.current.forEach((orbital) => {
+      if (orbital) {
+        const config = orbital.userData;
+        const angle = t * config.speed + config.phase;
+        orbital.position.set(
+          Math.cos(angle) * config.radius,
+          Math.sin(angle * 0.7) * config.radius * 0.5,
+          Math.sin(angle) * config.radius
+        );
+        orbital.rotation.x += delta * 1.5;
+        orbital.rotation.y += delta * 1;
+      }
+    });
   });
-
+  
   return (
     <group ref={root}>
-      <mesh ref={ringA} rotation={[1.35, 0.2, 0]}>
-        <torusGeometry args={[2.5, 0.11, 16, 96]} />
-        <meshStandardMaterial color="#46506b" metalness={0.92} roughness={0.24} emissive="#7547e8" emissiveIntensity={0.6} />
-      </mesh>
-      <mesh ref={ringB} rotation={[0.2, 0.5, 1.2]}>
-        <torusGeometry args={[3.0, 0.09, 16, 96]} />
-        <meshStandardMaterial color="#3b4560" metalness={0.94} roughness={0.22} emissive="#315bff" emissiveIntensity={0.5} />
-      </mesh>
-      <mesh ref={ringC} rotation={[1.1, 1.3, 0.5]}>
-        <torusGeometry args={[2.1, 0.075, 16, 96]} />
-        <meshStandardMaterial color="#2e3750" metalness={0.9} roughness={0.3} emissive="#27dccb" emissiveIntensity={0.55} />
-      </mesh>
-
-      <group ref={cageRef} rotation={[0.3, 0.6, 0.1]}>
-        <RectFrame w={2.2} h={2.2} thickness={0.12} accent="#27dccb" accentEdges={[0, 2]} />
+      <group ref={rings}>
+        <ThickTorusRing radius={3.2} tube={0.18} color="#1a1a2e" emissive="#7547e8" emissiveIntensity={0.4} rotation={[1.2, 0.3, 0]} />
+        <ThickTorusRing radius={2.6} tube={0.15} color="#1a1a2e" emissive="#315bff" emissiveIntensity={0.35} rotation={[0.2, 0.6, 1.1]} />
+        <ThickTorusRing radius={2.0} tube={0.12} color="#1a1a2e" emissive="#27dccb" emissiveIntensity={0.3} rotation={[1.0, 1.1, 0.4]} />
       </group>
-      <group rotation={[0.9, 1.2, 0.4]}>
-        <TriFrame r={1.2} thickness={0.1} accent="#7547e8" accentEdge={1} />
+      
+      <group ref={cage} rotation={[0.3, 0.5, 0.1]}>
+        <mesh
+          geometry={new THREE.BoxGeometry(3, 3, 3, 4, 4, 4)}
+          material={new THREE.MeshStandardMaterial({
+            color: '#1a1a2e',
+            metalness: 0.9,
+            roughness: 0.2,
+            emissive: accent,
+            emissiveIntensity: 0.2,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.6,
+          })}
+        />
       </group>
-      <group rotation={[0.5, 0.8, 0.3]}>
-        <HexFrame r={1.6} thickness={0.08} accent="#27dccb" />
+      
+      <group rotation={[0.8, 1.1, 0.3]}>
+        <mesh
+          geometry={createMobiusStrip(1.8, 0.4, 64, 3)}
+          material={new THREE.MeshStandardMaterial({
+            color: '#0d0d1a',
+            metalness: 0.98,
+            roughness: 0.1,
+            emissive: '#7547e8',
+            emissiveIntensity: 0.35,
+            side: THREE.DoubleSide,
+            flatShading: true,
+          })}
+          castShadow
+          receiveShadow
+        />
       </group>
-
-      <mesh>
-        <icosahedronGeometry args={[0.9, 0]} />
-        <meshStandardMaterial color="#2a3348" metalness={0.96} roughness={0.2} flatShading emissive="#103040" emissiveIntensity={0.4} />
-      </mesh>
-
-      {[
-        [2.5, 0, 0],
-        [-2.5, 0, 0],
-        [0, 3.0, 0],
-        [0, -2.2, 0],
-        [1.8, 1.8, 0],
-        [-1.8, -1.8, 0],
-      ].map((pos, i) => (
-        <mesh key={i} position={pos}>
-          <sphereGeometry args={[0.1, 16, 16]} />
-          <meshStandardMaterial color={i < 3 ? '#5c7cff' : '#b9f36b'} emissive={i < 3 ? '#315bff' : '#b9f36b'} emissiveIntensity={1.8} />
-        </mesh>
-      ))}
-
+      
+      <mesh
+        geometry={new THREE.DodecahedronGeometry(0.9, 1)}
+        material={new THREE.MeshStandardMaterial({
+          color: '#0d0d1a',
+          metalness: 0.98,
+          roughness: 0.08,
+          emissive: '#103040',
+          emissiveIntensity: 0.3,
+          flatShading: true,
+        })}
+        castShadow
+        receiveShadow
+      />
+      
       <group>
-        {[0, 1, 2].map((i) => (
-          <line key={i}>
-            <bufferGeometry>
-              <bufferAttribute
-                attach="attributes-position"
-                args={[
-                  new Float32Array([
-                    Math.cos((i / 3) * Math.PI * 2) * 2.5,
-                    Math.sin((i / 3) * Math.PI * 2) * 2.5,
-                    0,
-                    Math.cos(((i + 1) / 3) * Math.PI * 2) * 2.5,
-                    Math.sin(((i + 1) / 3) * Math.PI * 2) * 2.5,
-                    0,
-                  ]),
-                  3,
-                ]}
-              />
-            </bufferGeometry>
-            <lineBasicMaterial color="#27dccb" transparent opacity={0.3} />
-          </line>
+        {[
+          { radius: 3.5, speed: 0.3, phase: 0, color: '#7547e8' },
+          { radius: 3.0, speed: -0.25, phase: 2.1, color: '#315bff' },
+          { radius: 2.4, speed: 0.2, phase: 4.2, color: '#27dccb' },
+          { radius: 3.8, speed: -0.18, phase: 1.0, color: '#b9f36b' },
+          { radius: 2.8, speed: 0.22, phase: 3.1, color: '#7547e8' },
+          { radius: 3.3, speed: -0.22, phase: 5.2, color: '#27dccb' },
+        ].map((config, i) => (
+          <mesh
+            key={i}
+            ref={(el) => { if (el) orbitals.current.push(el); }}
+            geometry={new THREE.OctahedronGeometry(0.15, 0)}
+            material={new THREE.MeshStandardMaterial({
+              color: config.color,
+              emissive: config.color,
+              emissiveIntensity: 1.8,
+              metalness: 0.9,
+              roughness: 0.1,
+              flatShading: true,
+            })}
+            userData={config}
+            castShadow
+          />
         ))}
       </group>
     </group>

@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { eventData } from '../data/event';
 import { Reveal } from '../components/Reveal';
 import { EASE_OUT_EXPO } from '../lib/easing';
-import { ArrowUpRight, CheckCircle2, Send } from 'lucide-react';
+import { ArrowUpRight, CheckCircle2, Send, Mail, Lock, User, Building2 } from 'lucide-react';
 
 const initialForm = { name: '', email: '', college: '', track: 'novice' };
 
@@ -45,7 +45,7 @@ export function FinalCTA() {
   };
 
   const inputClass = (field) =>
-    `w-full px-4 py-3.5 rounded-sm bg-[#0b1017] border text-white text-sm font-sans outline-none focus:ring-2 focus:ring-[#7547e8]/70 transition-all duration-300 ${
+    `w-full pl-12 pr-4 py-3.5 rounded-sm bg-[#0b1017] border text-white text-sm font-sans outline-none focus:ring-2 focus:ring-[#7547e8]/70 transition-all duration-300 ${
       errors[field] ? 'border-rose-500' : 'hairline hover:border-white/20'
     }`;
 
@@ -79,8 +79,9 @@ export function FinalCTA() {
           <Reveal delay={0.12}>
             <div className="relative mt-12 tech-corners glass-panel rounded-sm p-8 sm:p-12 overflow-hidden">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-[#7547e8]/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#7547e8]/3 via-transparent to-transparent" />
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-7 mb-8 border-b hairline">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-7 mb-8 border-b hairline relative z-10">
                 <div>
                   <span className="font-mono text-[10px] text-[#7547e8] tracking-[0.22em] uppercase block mb-1.5">
                     Edition // 2027 Notification Registry
@@ -103,7 +104,7 @@ export function FinalCTA() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-                    className="text-center py-10"
+                    className="relative z-10 text-center py-10"
                   >
                     <div className="w-14 h-14 rounded-full bg-[rgba(117,71,232,0.1)] border border-[#7547e8]/40 flex items-center justify-center mx-auto mb-6">
                       <CheckCircle2 className="w-7 h-7 text-[#7547e8]" />
@@ -141,38 +142,44 @@ export function FinalCTA() {
                     transition={{ duration: 0.5 }}
                     onSubmit={handleSubmit}
                     noValidate
-                    className="space-y-6"
+                    className="relative z-10 space-y-6"
                   >
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div>
                         <label htmlFor="reg-name" className="block font-mono text-[11px] tracking-[0.18em] uppercase text-[#c7cfd9] mb-2">
                           Team Lead Name <span className="text-[#7547e8]">*</span>
                         </label>
-                        <input
-                          id="reg-name"
-                          type="text"
-                          value={form.name}
-                          onChange={update('name')}
-                          placeholder="e.g. Aniket Bodkhe"
-                          className={inputClass('name')}
-                          aria-invalid={Boolean(errors.name)}
-                        />
-                        {errors.name && <span className="text-xs text-rose-400 mt-1.5 block font-mono">{errors.name}</span>}
+                        <div className="relative">
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5c6673] pointer-events-none" />
+                          <input
+                            id="reg-name"
+                            type="text"
+                            value={form.name}
+                            onChange={update('name')}
+                            placeholder="e.g. Aniket Bodkhe"
+                            className={inputClass('name')}
+                            aria-invalid={Boolean(errors.name)}
+                          />
+                        </div>
+                        {errors.name && <span className="text-xs text-rose-400 mt-1.5 block font-mono ml-2">{errors.name}</span>}
                       </div>
                       <div>
                         <label htmlFor="reg-email" className="block font-mono text-[11px] tracking-[0.18em] uppercase text-[#c7cfd9] mb-2">
                           Official Email <span className="text-[#7547e8]">*</span>
                         </label>
-                        <input
-                          id="reg-email"
-                          type="email"
-                          value={form.email}
-                          onChange={update('email')}
-                          placeholder="developer@college.edu"
-                          className={inputClass('email')}
-                          aria-invalid={Boolean(errors.email)}
-                        />
-                        {errors.email && <span className="text-xs text-rose-400 mt-1.5 block font-mono">{errors.email}</span>}
+                        <div className="relative">
+                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5c6673] pointer-events-none" />
+                          <input
+                            id="reg-email"
+                            type="email"
+                            value={form.email}
+                            onChange={update('email')}
+                            placeholder="developer@college.edu"
+                            className={inputClass('email')}
+                            aria-invalid={Boolean(errors.email)}
+                          />
+                        </div>
+                        {errors.email && <span className="text-xs text-rose-400 mt-1.5 block font-mono ml-2">{errors.email}</span>}
                       </div>
                     </div>
 
@@ -181,30 +188,36 @@ export function FinalCTA() {
                         <label htmlFor="reg-college" className="block font-mono text-[11px] tracking-[0.18em] uppercase text-[#c7cfd9] mb-2">
                           Institution <span className="text-[#7547e8]">*</span>
                         </label>
-                        <input
-                          id="reg-college"
-                          type="text"
-                          value={form.college}
-                          onChange={update('college')}
-                          placeholder="College of Engineering"
-                          className={inputClass('college')}
-                          aria-invalid={Boolean(errors.college)}
-                        />
-                        {errors.college && <span className="text-xs text-rose-400 mt-1.5 block font-mono">{errors.college}</span>}
+                        <div className="relative">
+                          <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5c6673] pointer-events-none" />
+                          <input
+                            id="reg-college"
+                            type="text"
+                            value={form.college}
+                            onChange={update('college')}
+                            placeholder="College of Engineering"
+                            className={inputClass('college')}
+                            aria-invalid={Boolean(errors.college)}
+                          />
+                        </div>
+                        {errors.college && <span className="text-xs text-rose-400 mt-1.5 block font-mono ml-2">{errors.college}</span>}
                       </div>
                       <div>
                         <label htmlFor="reg-track" className="block font-mono text-[11px] tracking-[0.18em] uppercase text-[#c7cfd9] mb-2">
                           Target Track
                         </label>
-                        <select
-                          id="reg-track"
-                          value={form.track}
-                          onChange={update('track')}
-                          className="w-full px-4 py-3.5 rounded-sm bg-[#0b1017] hairline text-white text-sm outline-none focus:ring-2 focus:ring-[#7547e8]/70 transition-all"
-                        >
-                          <option value="novice">Novice — 1st & 2nd Year</option>
-                          <option value="expert">Expert — Advanced Systems</option>
-                        </select>
+                        <div className="relative">
+                          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5c6673] pointer-events-none" />
+                          <select
+                            id="reg-track"
+                            value={form.track}
+                            onChange={update('track')}
+                            className="w-full pl-12 pr-4 py-3.5 rounded-sm bg-[#0b1017] hairline text-white text-sm outline-none focus:ring-2 focus:ring-[#7547e8]/70 transition-all appearance-none"
+                          >
+                            <option value="novice">Novice — 1st & 2nd Year</option>
+                            <option value="expert">Expert — Advanced Systems</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
 

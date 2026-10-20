@@ -4,7 +4,7 @@ import { eventData } from '../data/event';
 import { SectionHeading } from '../components/SectionTag';
 import { Reveal } from '../components/Reveal';
 import { EASE_OUT_EXPO } from '../lib/easing';
-import { ChevronDown, Mail } from 'lucide-react';
+import { ChevronDown, Mail, HelpCircle } from 'lucide-react';
 
 const categories = [
   { id: 'all', label: 'All' },
@@ -21,11 +21,12 @@ function FaqItem({ item, index }) {
 
   return (
     <div
-      className={`rounded-sm border transition-colors duration-500 overflow-hidden ${
+      className={`relative rounded-sm border transition-colors duration-500 overflow-hidden group ${
         open ? 'border-[#7547e8]/30 bg-[rgba(117,71,232,0.03)]' : 'hairline bg-white/[0.015] hover:border-white/15'
       }`}
     >
-      <h3>
+      <div className="absolute inset-0 bg-gradient-to-r from-[#7547e8]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <h3 className="relative z-10">
         <button
           id={headerId}
           type="button"
@@ -34,13 +35,14 @@ function FaqItem({ item, index }) {
           aria-controls={contentId}
           className="w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left"
         >
-          <span className={`font-display font-semibold text-base sm:text-lg transition-colors duration-300 ${open ? 'text-[#7547e8]' : 'text-white'}`}>
-            {item.question}
-          </span>
+          <div className="flex items-center gap-3">
+            <HelpCircle className={`w-5 h-5 shrink-0 transition-colors duration-300 ${open ? 'text-[#7547e8]' : 'text-[#5c6673]'}`} />
+            <span className={`font-display font-semibold text-base sm:text-lg transition-colors duration-300 ${open ? 'text-[#7547e8]' : 'text-white'}`}>
+              {item.question}
+            </span>
+          </div>
           <ChevronDown
-            className={`w-5 h-5 shrink-0 text-[#5c6673] transition-transform duration-500 ${
-              open ? 'rotate-180 text-[#7547e8]' : ''
-            }`}
+            className={`w-5 h-5 shrink-0 text-[#5c6673] transition-transform duration-500 ${open ? 'rotate-180 text-[#7547e8]' : ''}`}
           />
         </button>
       </h3>
@@ -55,12 +57,13 @@ function FaqItem({ item, index }) {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.5, ease: EASE_OUT_EXPO }}
           >
-            <p className="px-5 sm:px-6 pb-6 text-sm sm:text-base text-[#929caa] leading-relaxed border-t hairline pt-4">
+            <div className="relative z-10 px-5 sm:px-6 pb-6 text-sm sm:text-base text-[#929caa] leading-relaxed border-t hairline pt-4">
               {item.answer}
-            </p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7547e8]/30 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
     </div>
   );
 }
@@ -98,13 +101,14 @@ export function FAQ() {
                 key={cat.id}
                 onClick={() => setCategory(cat.id)}
                 aria-pressed={category === cat.id}
-                className={`px-4 py-2 rounded-sm font-mono text-[11px] tracking-[0.16em] uppercase border transition-all duration-300 ${
+                className={`relative px-4 py-2 rounded-sm font-mono text-[11px] tracking-[0.16em] uppercase border transition-all duration-300 overflow-hidden ${
                   category === cat.id
                     ? 'bg-[#7547e8] text-[#05060b] border-[#7547e8] font-bold'
                     : 'hairline text-[#929caa] hover:text-white hover:border-white/20'
                 }`}
               >
-                {cat.label}
+                <span className="relative z-10">{cat.label}</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#7547e8]/10 via-transparent to-transparent" />
               </button>
             ))}
           </div>
@@ -120,7 +124,8 @@ export function FAQ() {
 
         <Reveal delay={0.1}>
           <div className="mt-12 max-w-4xl glass-panel rounded-sm p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="font-mono text-xs text-[#929caa]">
+            <div className="relative font-mono text-xs text-[#929caa] flex items-center gap-2">
+              <HelpCircle className="w-4 h-4 text-[#7547e8]" />
               <span className="text-white font-bold block mb-1">Unresolved questions?</span>
               <a href={`mailto:${eventData.contactEmail}`} className="text-[#7547e8] hover:underline">
                 {eventData.contactEmail}

@@ -11,7 +11,7 @@ const icons = {
   certificates: Award,
 };
 
-const accents = ['#27dccb', '#315bff', '#7547e8', '#27dccb'];
+const prizeAccents = ['#27dccb', '#315bff', '#7547e8', '#27dccb'];
 
 export function Prizes() {
   const [featured, ...rest] = eventData.prizes;
@@ -32,7 +32,7 @@ export function Prizes() {
           description="Trophies, career acceleration, national citations."
         />
 
-        {/* Flagship award — visual centrepiece */}
+        {/* Flagship award - unique layout */}
         <Reveal>
           <div className="relative mb-10 overflow-hidden rounded-sm border border-white/10 bg-gradient-to-b from-[#12152a]/90 via-[#0c0f1b]/85 to-[#080a12]/90">
             <div
@@ -40,7 +40,7 @@ export function Prizes() {
               className="absolute inset-0 opacity-60 [background-image:linear-gradient(rgba(117,71,232,0.10)_1px,transparent_1px),linear-gradient(90deg,rgba(49,91,255,0.10)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_78%)]"
             />
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 lg:p-16">
-              <div className="lg:col-span-7">
+              <div className="lg:col-span-7 relative z-10">
                 <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#27dccb]">
                   {featured.category}
                 </span>
@@ -63,7 +63,7 @@ export function Prizes() {
               </div>
 
               {/* Geometric trophy composition */}
-              <div className="lg:col-span-5 flex justify-center">
+              <div className="lg:col-span-5 flex justify-center relative z-10">
                 <div className="relative flex h-64 w-64 items-center justify-center">
                   <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(39,220,203,0.18),transparent_66%)]" />
                   <div className="absolute inset-6 rotate-45 rounded-[18%] border border-[#7547e8]/40" />
@@ -79,41 +79,70 @@ export function Prizes() {
           </div>
         </Reveal>
 
-        {/* Supporting awards — asymmetric editorial row */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {/* Supporting awards - unique asymmetric cards */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
           {rest.map((prize, i) => {
             const Icon = icons[prize.id] || Award;
-            const accent = accents[i % accents.length];
-            const wide = i === 0;
+            const accent = prizeAccents[i % prizeAccents.length];
             return (
               <Reveal key={prize.id} delay={0.06 + i * 0.06} y={22}>
                 <article
-                  className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-sm border border-white/10 bg-white/[0.02] p-7 transition-colors duration-500 hover:border-white/20 ${
-                    wide ? 'md:col-span-1' : ''
+                  className={`group relative flex flex-col h-full overflow-hidden rounded-sm border border-white/10 bg-white/[0.02] transition-colors duration-500 hover:border-white/20 ${
+                    i === 0 ? 'md:row-span-2 lg:col-span-2' : ''
                   }`}
                 >
                   <div
                     aria-hidden="true"
-                    className="absolute -right-10 -top-10 h-32 w-32 rounded-full opacity-0 blur-2xl transition-opacity duration-700 group-hover:opacity-100"
+                    className="absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-700 group-hover:opacity-100"
                     style={{ background: accent }}
                   />
-                  <div>
-                    <div
-                      className="flex h-11 w-11 items-center justify-center rounded-sm border border-white/10"
-                      style={{ background: `${accent}14` }}
-                    >
-                      <Icon className="h-5 w-5" style={{ color: accent }} strokeWidth={1.7} />
+                  
+                  {i === 0 ? (
+                    // Featured wide card
+                    <div className="relative z-10 p-7 h-full flex flex-col">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-sm border border-white/10 mb-4" style={{ background: `${accent}14` }}>
+                        <Icon className="h-6 w-6" style={{ color: accent }} strokeWidth={1.7} />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-display text-xl font-semibold leading-snug text-[#f5f6fa] mb-2">
+                          {prize.title}
+                        </h4>
+                        <p className="text-sm leading-relaxed text-[#a5aabd]">
+                          {prize.description}
+                        </p>
+                      </div>
+                      <div className="mt-4 pt-4 border-t hairline flex flex-wrap gap-2">
+                        {prize.perks.slice(0, 3).map((perk) => (
+                          <span key={perk} className="rounded-sm border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#c7cfd9]">
+                            {perk}
+                          </span>
+                        ))}
+                      </div>
+                      <span className="mt-4 font-mono text-[10px] uppercase tracking-[0.18em] text-[#6b7488] block">
+                        {prize.category}
+                      </span>
                     </div>
-                    <h4 className="mt-6 font-display text-xl font-semibold leading-snug text-[#f5f6fa]">
-                      {prize.title}
-                    </h4>
-                    <p className="mt-2.5 text-sm leading-relaxed text-[#a5aabd]">
-                      {prize.description}
-                    </p>
-                  </div>
-                  <span className="mt-6 font-mono text-[10px] uppercase tracking-[0.18em] text-[#6b7488]">
-                    {prize.category}
-                  </span>
+                  ) : (
+                    // Standard cards
+                    <div className="relative z-10 p-6 h-full flex flex-col">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-sm border border-white/10 mb-4" style={{ background: `${accent}14` }}>
+                        <Icon className="h-5 w-5" style={{ color: accent }} strokeWidth={1.7} />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-display text-lg font-semibold leading-snug text-[#f5f6fa] mb-2">
+                          {prize.title}
+                        </h4>
+                        <p className="text-sm leading-relaxed text-[#a5aabd]">
+                          {prize.description}
+                        </p>
+                      </div>
+                      <span className="mt-4 font-mono text-[10px] uppercase tracking-[0.18em] text-[#6b7488] block">
+                        {prize.category}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-current/30 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" style={{ opacity: 0.5 }} />
                 </article>
               </Reveal>
             );
