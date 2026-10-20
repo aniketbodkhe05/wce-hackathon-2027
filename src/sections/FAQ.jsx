@@ -1,0 +1,141 @@
+import { useMemo, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { eventData } from '../data/event';
+import { SectionHeading } from '../components/SectionTag';
+import { Reveal } from '../components/Reveal';
+import { EASE_OUT_EXPO } from '../lib/easing';
+import { ChevronDown, Mail } from 'lucide-react';
+
+const categories = [
+  { id: 'all', label: 'All' },
+  { id: 'general', label: 'General' },
+  { id: 'tracks', label: 'Tracks' },
+  { id: 'rules', label: 'Rules' },
+  { id: 'logistics', label: 'Logistics' },
+];
+
+function FaqItem({ item, index }) {
+  const [open, setOpen] = useState(index === 0);
+  const contentId = `faq-c-${index}`;
+  const headerId = `faq-h-${index}`;
+
+  return (
+    <div
+      className={`rounded-sm border transition-colors duration-500 overflow-hidden ${
+        open ? 'border-[#7547e8]/30 bg-[rgba(117,71,232,0.03)]' : 'hairline bg-white/[0.015] hover:border-white/15'
+      }`}
+    >
+      <h3>
+        <button
+          id={headerId}
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-controls={contentId}
+          className="w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left"
+        >
+          <span className={`font-display font-semibold text-base sm:text-lg transition-colors duration-300 ${open ? 'text-[#7547e8]' : 'text-white'}`}>
+            {item.question}
+          </span>
+          <ChevronDown
+            className={`w-5 h-5 shrink-0 text-[#5c6673] transition-transform duration-500 ${
+              open ? 'rotate-180 text-[#7547e8]' : ''
+            }`}
+          />
+        </button>
+      </h3>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            id={contentId}
+            role="region"
+            aria-labelledby={headerId}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.5, ease: EASE_OUT_EXPO }}
+          >
+            <p className="px-5 sm:px-6 pb-6 text-sm sm:text-base text-[#929caa] leading-relaxed border-t hairline pt-4">
+              {item.answer}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export function FAQ() {
+  const [category, setCategory] = useState('all');
+  const filtered = useMemo(
+    () => (category === 'all' ? eventData.faqs : eventData.faqs.filter((f) => f.category === category)),
+    [category]
+  );
+
+  return (
+    <section
+      id="faq"
+      aria-label="Frequently asked questions"
+      className="relative py-28 sm:py-40 overflow-hidden"
+    >
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(49,91,255,0.04),transparent_55%)]"
+      />
+      <div className="container-custom relative z-10">
+        <SectionHeading
+          index="SEC // 08"
+          kicker="Knowledge Base"
+          title="Questions,"
+          accent="answered."
+          description="Eligibility, rules, logistics."
+        />
+
+        <Reveal delay={0.08}>
+          <div className="flex flex-wrap gap-2 mb-10">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setCategory(cat.id)}
+                aria-pressed={category === cat.id}
+                className={`px-4 py-2 rounded-sm font-mono text-[11px] tracking-[0.16em] uppercase border transition-all duration-300 ${
+                  category === cat.id
+                    ? 'bg-[#7547e8] text-[#05060b] border-[#7547e8] font-bold'
+                    : 'hairline text-[#929caa] hover:text-white hover:border-white/20'
+                }`}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </Reveal>
+
+        <div className="max-w-4xl space-y-3">
+          {filtered.map((item, i) => (
+            <Reveal key={item.question} delay={Math.min(i * 0.05, 0.3)} y={18}>
+              <FaqItem item={item} index={i} />
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal delay={0.1}>
+          <div className="mt-12 max-w-4xl glass-panel rounded-sm p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="font-mono text-xs text-[#929caa]">
+              <span className="text-white font-bold block mb-1">Unresolved questions?</span>
+              <a href={`mailto:${eventData.contactEmail}`} className="text-[#7547e8] hover:underline">
+                {eventData.contactEmail}
+              </a>
+            </div>
+            <a
+              href={`mailto:${eventData.contactEmail}?subject=${encodeURIComponent('WCE Hackathon 2027 — Query')}`}
+              className="btn-secondary shrink-0 !py-3"
+            >
+              <Mail className="w-4 h-4" />
+              Contact Desk
+            </a>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
