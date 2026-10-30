@@ -34,15 +34,11 @@ const blocks = [
     title: 'Walchand College of Engineering',
     subtitle: 'Sangli, Maharashtra',
     description:
-      'Walchand College of Engineering Sangli (WCE), established in 1947 and aided by the Government of Maharashtra, is one of the oldest and premier engineering institutions in India. With a rich history of over 70 years and a beautiful campus of over 90 acres, WCE Sangli provides transformational learning experiences across engineering disciplines.',
+      "A government-aided institute in Sangli, shaping engineering education through strong academics and a 90+ acre campus.",
     icon: Landmark,
     logo: '/logos/wce-logo.svg',
     logoAlt: 'Walchand College of Engineering Sangli',
     accent: accents.violet,
-    facts: [
-      { icon: Calendar, label: 'Established', value: '1947' },
-      { icon: MapPin, label: 'Campus', value: '90+ Acres' },
-    ],
   },
   {
     code: '02',
@@ -50,15 +46,11 @@ const blocks = [
     title: 'WCE ACM Student Chapter',
     subtitle: 'Authorized March 18, 2016',
     description:
-      "The WCE ACM Student Chapter, authorized by ACM India Council on March 18, 2016, aims to impart knowledge and promote innovation in computer science. Inspired by ACM's global mission, we strive to achieve this through technical and non-technical activities.",
+      "The chapter promotes computer science innovation through technical and non-technical activities for students.",
     icon: Users,
     logo: '/logos/acm-logo.png',
     logoAlt: 'WCE ACM Student Chapter',
     accent: accents.turquoise,
-    facts: [
-      { icon: ShieldCheck, label: 'Authorized by', value: 'ACM India Council' },
-      { icon: Users, label: 'Community', value: 'Technical & Non-Technical' },
-    ],
   },
 ];
 
@@ -66,7 +58,7 @@ const stats = [
   { value: '1947', label: 'Established', icon: Calendar },
   { value: '90+', unit: 'Acres', label: 'Campus', icon: MapPin },
   { value: '2016', label: 'WCE ACM Authorized', icon: ShieldCheck },
-  { value: '9', unit: 'Years', label: 'WCE ACM Legacy', icon: Award },
+  { value: '10', unit: 'Years', label: 'of WCE ACM', icon: Award },
 ];
 
 function InfoCard({ block, delay }) {
@@ -91,50 +83,27 @@ function InfoCard({ block, delay }) {
               <Icon className="h-5 w-5" strokeWidth={1.5} />
             </div>
 
-            <div className="flex items-center gap-4">
-              <img
-                src={block.logo}
-                alt={block.logoAlt}
-                className="h-9 w-9 object-contain opacity-75 transition-opacity duration-500 group-hover:opacity-100"
-                loading="lazy"
-              />
-              <span className={`font-mono text-[10px] tracking-[0.2em] ${accent.text}`}>
-                {block.code}
-              </span>
-            </div>
+            <img
+              src={block.logo}
+              alt={block.logoAlt}
+              className="h-9 w-9 object-contain opacity-75 transition-opacity duration-500 group-hover:opacity-100"
+              loading="lazy"
+            />
           </div>
 
-          <span className={`font-mono text-[10px] uppercase tracking-[0.22em] ${accent.text}`}>
+          <span className={`font-mono text-[11px] uppercase tracking-[0.22em] ${accent.text}`}>
             {block.kicker}
           </span>
           <h3 className="mt-3 font-display text-2xl font-semibold leading-tight text-[#f2f5f7] sm:text-[1.65rem]">
             {block.title}
           </h3>
-          <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#5c6673]">
+          <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-[#7b8494]">
             {block.subtitle}
           </p>
 
-          <p className="mt-5 flex-1 text-sm leading-relaxed text-[#929caa] sm:text-[15px]">
+          <p className="mt-5 text-sm leading-relaxed text-[#a3adba] sm:text-[15px]">
             {block.description}
           </p>
-
-          <div className="mt-7 grid grid-cols-1 gap-4 border-t hairline pt-5 sm:grid-cols-2">
-            {block.facts.map((fact) => {
-              const FactIcon = fact.icon;
-
-              return (
-                <div key={fact.label} className="flex items-start gap-3">
-                  <FactIcon className={`mt-0.5 h-4 w-4 shrink-0 ${accent.text}`} strokeWidth={1.5} />
-                  <div>
-                    <div className="font-mono text-[9px] uppercase tracking-[0.18em] text-[#5c6673]">
-                      {fact.label}
-                    </div>
-                    <div className="mt-0.5 text-sm text-[#f2f5f7]">{fact.value}</div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
 
         <div
@@ -168,12 +137,12 @@ function StatCard({ stat, delay }) {
                 {stat.value}
               </span>
               {stat.unit && (
-                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#7547e8]">
+                <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-[#7547e8]">
                   {stat.unit}
                 </span>
               )}
             </div>
-            <div className="mt-1.5 font-mono text-[10px] uppercase leading-relaxed tracking-[0.16em] text-[#5c6673]">
+            <div className="mt-1.5 font-mono text-[11px] uppercase leading-relaxed tracking-[0.16em] text-[#7b8494]">
               {stat.label}
             </div>
           </div>
@@ -187,7 +156,7 @@ export function About() {
   return (
     <section
       id="about"
-      aria-label="About WCE Hackathon 2026"
+      aria-label="About WCE Hackathon 2027"
       className="relative section-pad overflow-hidden"
     >
       <div
@@ -202,25 +171,12 @@ export function About() {
       <div className="container-custom relative z-10">
         <div className="mb-14 text-center sm:mb-16">
           <Reveal>
-            <div className="mb-6 flex items-center justify-center gap-3">
-              <span className="h-px w-8 bg-gradient-to-r from-transparent to-[#7547e8]" />
-              <span className="font-mono text-[11px] tracking-[0.2em] text-[#7547e8]">
-                SEC // 01
-              </span>
-              <span className="h-px w-8 bg-gradient-to-r from-[#7547e8] to-transparent" />
-              <span className="tick-label hidden sm:inline">Legacy & Identity</span>
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.08}>
-            <h2 className="section-title uppercase text-[#f2f5f7]">
-              About <span className="text-gradient-violet">WCE Hackathon</span>
-            </h2>
+            <h2 className="section-title uppercase text-[#f2f5f7]">ABOUT</h2>
           </Reveal>
 
           <Reveal delay={0.16}>
-            <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#929caa] sm:text-lg">
-              Where Innovation Meets Collaboration.
+            <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#a3adba] sm:text-lg">
+              WCE Sangli, WCE ACM, and VISION 2027.
             </p>
           </Reveal>
         </div>
@@ -246,13 +202,13 @@ export function About() {
               <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
                 <div className="lg:col-span-8">
                   <div className="mb-7 flex flex-wrap items-center gap-3">
-                    <span className="inline-flex items-center gap-2 rounded-sm border border-[#b9f36b]/25 bg-[#b9f36b]/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#b9f36b]">
+                    <span className="inline-flex items-center gap-2 rounded-sm border border-[#b9f36b]/25 bg-[#b9f36b]/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-[#b9f36b]">
                       <span className="status-dot pulse-dot" />
-                      VISION 2026 Highlight
+                      VISION 2027 Highlight
                     </span>
                     <img
-                      src="/logos/hackathon-logo.png"
-                      alt="WCE Hackathon 2026"
+                      src="/logos/hackathon-2027-logo.png"
+                      alt="WCE Hackathon 2027"
                       className="h-6 w-auto object-contain opacity-80"
                       loading="lazy"
                     />
@@ -262,27 +218,26 @@ export function About() {
                     <span className="flex h-9 w-9 items-center justify-center rounded-sm border border-[#7547e8]/35 bg-[#7547e8]/10 text-[#7547e8]">
                       <Rocket className="h-4 w-4" strokeWidth={1.5} />
                     </span>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#7547e8]">
-                      03 // The Arena
+                    <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#7547e8]">
+                      The Arena
                     </span>
                   </div>
 
                   <h3 className="font-display text-3xl font-semibold leading-tight text-[#f2f5f7] sm:text-4xl lg:text-5xl">
                     WCE Hackathon{' '}
-                    <span className="text-gradient-violet">2026</span>
+                    <span className="text-gradient-violet">2027</span>
                   </h3>
 
                   <p className="mt-5 max-w-2xl text-sm leading-relaxed text-[#c7cfd9] sm:text-base lg:text-lg">
-                    The highlight of the VISION event at WCE Sangli is the WCE Hackathon.
-                    Celebrating 9 years of WCE ACM, the WCE Hackathon 2026 is more than a coding
-                    competition — it is a celebration of innovation, creativity, and collaboration.
+                    The highlight of VISION 2027 brings students together to build solutions around
+                    real-world problems.
                   </p>
 
                   <div className="mt-7 flex flex-wrap gap-2">
-                    {['Innovation', 'Creativity', 'Collaboration'].map((item) => (
+                    {['Novice Track', 'Expert Track', 'WCE Sangli'].map((item) => (
                       <span
                         key={item}
-                        className="inline-flex items-center gap-1.5 rounded-sm border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#929caa]"
+                        className="inline-flex items-center gap-1.5 rounded-sm border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-[#a3adba]"
                       >
                         <Sparkles className="h-3 w-3 text-[#7547e8]" strokeWidth={1.5} />
                         {item}
@@ -303,14 +258,14 @@ export function About() {
                     <div className="absolute inset-10 rounded-full bg-[#7547e8]/5 blur-xl" />
 
                     <div className="relative flex flex-col items-center text-center">
-                      <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#929caa]">
-                        Celebrating
+                      <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#a3adba]">
+                        Build sprint
                       </span>
                       <span className="font-display text-6xl font-semibold leading-none text-gradient-violet sm:text-7xl">
-                        09
+                        24
                       </span>
-                      <span className="mt-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[#7547e8]">
-                        Years of WCE ACM
+                      <span className="mt-2 font-mono text-[11px] uppercase tracking-[0.18em] text-[#7547e8]">
+                        Hours on campus
                       </span>
                     </div>
                   </div>
@@ -323,8 +278,8 @@ export function About() {
         <div className="mt-12 sm:mt-14">
           <Reveal>
             <div className="flex items-center gap-4">
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#7547e8]">
-                Legacy // By the Numbers
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-[#7547e8]">
+                By the Numbers
               </span>
               <span className="h-px flex-1 bg-gradient-to-r from-[#7547e8]/30 to-transparent" />
             </div>

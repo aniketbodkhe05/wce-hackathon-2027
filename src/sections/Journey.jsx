@@ -34,11 +34,8 @@ export function Journey() {
 
       <div className="container-custom relative z-10">
         <SectionHeading
-          index="SEC // 07"
-          kicker="The Process"
-          title="From idea"
-          accent="to arena."
-          description="Five stages — discovery, architecture, build, checkpoints, demo."
+          title="JOURNEY"
+          description="Five steps from concept to final presentation."
         />
 
         <div className="relative">
@@ -53,13 +50,26 @@ export function Journey() {
                 <div className="relative pl-10 sm:pl-14 group">
                   <span
                     aria-hidden="true"
-                    className={`absolute left-0 top-2 w-[24px] h-[24px] rounded-full border-2 transition-all duration-500 flex items-center justify-center ${
+                    className={`absolute left-0 top-2 flex h-[24px] w-[24px] items-center justify-center rounded-full border-2 transition-all duration-500 ${
                       i === 0
-                        ? `border-[${stepColors[step.step]}] bg-[${stepColors[step.step]}] shadow-[0_0_16px_${stepColors[step.step]}]`
+                        ? ''
                         : 'border-[#1b2430] bg-[#07090d] group-hover:border-[#7547e8]/60'
                     }`}
+                    style={
+                      i === 0
+                        ? {
+                            borderColor: stepColors[step.step],
+                            backgroundColor: stepColors[step.step],
+                            boxShadow: `0 0 16px ${stepColors[step.step]}`,
+                          }
+                        : undefined
+                    }
                   >
-                    <span className="font-display text-[10px] font-semibold text-[#05060b]">
+                    <span
+                      className={`font-display text-[12px] font-semibold ${
+                        i === 0 ? 'text-[#05060b]' : 'text-white'
+                      }`}
+                    >
                       {step.step}
                     </span>
                   </span>
@@ -70,13 +80,13 @@ export function Journey() {
                         <div className="w-12 h-12 rounded-xl border border-white/5 flex items-center justify-center group-hover:border-current/30 transition-all duration-500 mb-6 shrink-0" style={{ background: `linear-gradient(135deg, ${stepColors[step.step]}1a, ${stepColors[step.step]}0d)` }}>
                           <StepIcon step={step.step} color={stepColors[step.step]} />
                         </div>
-                        <span className="font-mono text-[11px] text-[#7547e8] tracking-[0.2em] block mb-2">
+                        <span className="font-mono text-[12px] text-[#7547e8] tracking-[0.2em] block mb-2">
                           STEP {step.step}
                         </span>
                         <h3 className="font-display font-semibold text-2xl sm:text-3xl text-[#f2f5f7] leading-tight mb-3">
                           {step.title}
                         </h3>
-                        <p className="font-mono text-[11px] text-[#5c6673] tracking-[0.14em] uppercase">
+                        <p className="font-mono text-[12px] text-[#7b8494] tracking-[0.14em] uppercase">
                           {step.subtitle}
                         </p>
                       </div>
@@ -86,7 +96,7 @@ export function Journey() {
                       <div className="relative glass-panel tech-corners rounded-sm p-6 sm:p-7 h-full group overflow-hidden" style={{ '--step-color': stepColors[step.step] }}>
                         <div className="absolute inset-0 bg-gradient-to-r from-[var(--step-color)]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                         <div className="relative z-10">
-                          <p className="text-[#929caa] leading-relaxed max-w-2xl mb-5">{step.description}</p>
+                          <p className="text-[#a3adba] leading-relaxed max-w-2xl mb-5">{step.description}</p>
                           <ul className="space-y-2.5 pt-4 border-t hairline">
                             {step.keyOutputs.map((out) => (
                               <li

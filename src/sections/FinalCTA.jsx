@@ -63,16 +63,13 @@ export function FinalCTA() {
       <div className="container-custom relative z-10">
         <div className="max-w-4xl mx-auto">
           <Reveal className="text-center">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <span className="font-mono text-[11px] text-[#7547e8] tracking-[0.2em]">SEC // 09</span>
-            </div>
             <h2 className="font-display font-extrabold uppercase tracking-[-0.02em] leading-[1.02] text-4xl sm:text-5xl lg:text-6xl">
-              Your next idea could
+              Ready to
               <br />
-              <span className="text-gradient-violet">change everything.</span>
+              <span className="text-gradient-violet">build?</span>
             </h2>
-            <p className="mt-6 text-[#929caa] text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
-              Priority access to 2027 problem dossiers.
+            <p className="mt-6 mx-auto max-w-xl text-base leading-relaxed text-[#a3adba] sm:text-lg">
+              Get 2027 updates and problem statements first.
             </p>
           </Reveal>
 
@@ -83,14 +80,14 @@ export function FinalCTA() {
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-7 mb-8 border-b hairline relative z-10">
                 <div>
-                  <span className="font-mono text-[10px] text-[#7547e8] tracking-[0.22em] uppercase block mb-1.5">
-                    Edition // 2027 Notification Registry
+                  <span className="mb-1.5 block font-mono text-[11px] uppercase tracking-[0.2em] text-[#7547e8]">
+                    WCE Hackathon 2027
                   </span>
-                  <h3 className="font-display font-extrabold text-xl sm:text-2xl text-white uppercase">
-                    Priority Access
+                  <h3 className="font-display text-xl font-extrabold uppercase text-white sm:text-2xl">
+                    Join the interest list
                   </h3>
                 </div>
-                <span className="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-white/[0.03] border hairline font-mono text-[10px] tracking-[0.18em] text-[#929caa] uppercase shrink-0">
+                <span className="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-white/[0.03] border hairline font-mono text-[11px] tracking-[0.18em] text-[#a3adba] uppercase shrink-0">
                   <span className="w-2 h-2 rounded-full bg-[#b9f36b] pulse-dot" />
                   Pre-registration open
                 </span>
@@ -112,10 +109,12 @@ export function FinalCTA() {
                     <h4 className="font-display font-extrabold text-3xl text-white uppercase">
                       Interest logged
                     </h4>
-                    <p className="mt-4 text-[#929caa] max-w-md mx-auto leading-relaxed">
-                      {form.name.split(' ')[0]} — your priority alert for the{' '}
-                      <span className="text-[#7547e8] font-mono text-sm">{form.track.toUpperCase()}</span> track
-                      is recorded in this browser session.
+                    <p className="mx-auto mt-4 max-w-md leading-relaxed text-[#a3adba]">
+                      {form.name.split(' ')[0]}, your interest in the{' '}
+                      <span className="font-mono text-sm text-[#7547e8]">
+                        {form.track.toUpperCase()}
+                      </span>{' '}
+                      track is saved in this browser.
                     </p>
                     <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                       <a href={eventData.officialWebsite} target="_blank" rel="noopener noreferrer" className="btn-secondary">
@@ -127,7 +126,7 @@ export function FinalCTA() {
                           setSubmitted(false);
                           setForm(initialForm);
                         }}
-                        className="font-mono text-xs text-[#929caa] hover:text-white transition-colors uppercase tracking-[0.16em]"
+                        className="font-mono text-xs text-[#a3adba] hover:text-white transition-colors uppercase tracking-[0.16em]"
                       >
                         Submit another
                       </button>
@@ -147,10 +146,10 @@ export function FinalCTA() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div>
                         <label htmlFor="reg-name" className="block font-mono text-[11px] tracking-[0.18em] uppercase text-[#c7cfd9] mb-2">
-                          Team Lead Name <span className="text-[#7547e8]">*</span>
+                          Team lead <span className="text-[#7547e8]">*</span>
                         </label>
                         <div className="relative">
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5c6673] pointer-events-none" />
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7b8494] pointer-events-none" />
                           <input
                             id="reg-name"
                             type="text"
@@ -165,10 +164,10 @@ export function FinalCTA() {
                       </div>
                       <div>
                         <label htmlFor="reg-email" className="block font-mono text-[11px] tracking-[0.18em] uppercase text-[#c7cfd9] mb-2">
-                          Official Email <span className="text-[#7547e8]">*</span>
+                          Email <span className="text-[#7547e8]">*</span>
                         </label>
                         <div className="relative">
-                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5c6673] pointer-events-none" />
+                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7b8494] pointer-events-none" />
                           <input
                             id="reg-email"
                             type="email"
@@ -186,10 +185,10 @@ export function FinalCTA() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <div>
                         <label htmlFor="reg-college" className="block font-mono text-[11px] tracking-[0.18em] uppercase text-[#c7cfd9] mb-2">
-                          Institution <span className="text-[#7547e8]">*</span>
+                          College <span className="text-[#7547e8]">*</span>
                         </label>
                         <div className="relative">
-                          <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5c6673] pointer-events-none" />
+                          <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7b8494] pointer-events-none" />
                           <input
                             id="reg-college"
                             type="text"
@@ -204,10 +203,10 @@ export function FinalCTA() {
                       </div>
                       <div>
                         <label htmlFor="reg-track" className="block font-mono text-[11px] tracking-[0.18em] uppercase text-[#c7cfd9] mb-2">
-                          Target Track
+                          Track
                         </label>
                         <div className="relative">
-                          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#5c6673] pointer-events-none" />
+                          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7b8494] pointer-events-none" />
                           <select
                             id="reg-track"
                             value={form.track}
@@ -221,17 +220,17 @@ export function FinalCTA() {
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 text-xs text-[#5c6673] font-mono leading-relaxed panel-line rounded-sm p-4">
-                      <span className="text-[#7547e8] mt-0.5">i</span>
-                      This logs your interest for 2027 priority updates. Final Round 1 registration happens on the official symposium portal upon release.
+                    <div className="panel-line flex items-start gap-3 rounded-sm p-4 font-mono text-xs leading-relaxed text-[#7b8494]">
+                      <span className="mt-0.5 text-[#7547e8]">i</span>
+                      Saves your interest for 2027 updates in this browser. Final Round 1 registration opens on the official symposium portal.
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+                    <div className="flex flex-col items-center justify-between gap-4 pt-2 sm:flex-row">
                       <button type="submit" className="btn-primary">
-                        Record Pre-Registration
+                        Register interest
                         <Send className="w-4 h-4" />
                       </button>
-                      <span className="font-mono text-[10px] tracking-[0.2em] text-[#5c6673] uppercase">
+                      <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#7b8494]">
                         Round 1 entry — 100% free
                       </span>
                     </div>
