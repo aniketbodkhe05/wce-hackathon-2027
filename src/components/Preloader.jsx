@@ -118,11 +118,11 @@ export function Preloader({ onComplete }) {
 
       {/* Branding */}
       <div className="text-center mb-6">
-        <div className="font-mono text-[10px] text-[#7547e8] tracking-[0.24em] uppercase mb-1">
-          WCE HACKATHON // 2027
+        <div className="font-mono text-[11px] text-[#7547e8] tracking-[0.24em] uppercase mb-1">
+          WCE HACKATHON 2027
         </div>
         <div className="font-display font-semibold text-xs tracking-[0.18em] text-white uppercase">
-          Initializing geometric instrument
+          Loading event information
         </div>
       </div>
 
@@ -136,7 +136,7 @@ export function Preloader({ onComplete }) {
       </div>
 
       {step > 0 && (
-        <div className="mt-4 font-mono text-[10px] text-[#5c6673] tracking-[0.2em] uppercase">
+        <div className="mt-4 font-mono text-[11px] text-[#7b8494] tracking-[0.2em] uppercase">
           {progress}% loaded
         </div>
       )}

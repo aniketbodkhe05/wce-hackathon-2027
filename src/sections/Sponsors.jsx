@@ -12,11 +12,8 @@ export function Sponsors() {
       />
       <div className="container-custom relative z-10">
         <SectionHeading
-          index="SEC // 06"
-          kicker="Ecosystem"
-          title="Partner with the"
-          accent="arena."
-          description="Sponsorship tiers for 2027 are open."
+          title="SPONSORS"
+          description="Sponsorship opportunities for 2027 are open."
         />
 
         {/* Sponsorship tiers - unique card design */}
@@ -27,7 +24,7 @@ export function Sponsors() {
                 <div className="absolute inset-0 bg-gradient-to-br from-[#7547e8]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-6">
-                    <span className="font-mono text-[10px] tracking-[0.2em] text-[#7547e8] px-2.5 py-1 bg-[rgba(117,71,232,0.07)] border border-[rgba(117,71,232,0.2)] rounded-sm uppercase">
+                    <span className="font-mono text-[11px] tracking-[0.2em] text-[#7547e8] px-2.5 py-1 bg-[rgba(117,71,232,0.07)] border border-[rgba(117,71,232,0.2)] rounded-sm uppercase">
                       {tier.badge}
                     </span>
                     <span className="status-dot pulse-dot" />
@@ -52,7 +49,7 @@ export function Sponsors() {
                     href={`mailto:${eventData.contactEmail}?subject=${encodeURIComponent(
                       'WCE Hackathon 2027 — ' + tier.tier
                     )}`}
-                    className="mt-7 pt-5 border-t hairline font-mono text-[11px] tracking-[0.18em] uppercase text-[#929caa] hover:text-[#7547e8] transition-colors flex items-center gap-2 group"
+                    className="mt-7 pt-5 border-t hairline font-mono text-[11px] tracking-[0.18em] uppercase text-[#a3adba] hover:text-[#7547e8] transition-colors flex items-center gap-2 group"
                   >
                     Request prospectus
                     <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -67,18 +64,10 @@ export function Sponsors() {
         {/* Past Partners - unique layout */}
         <Reveal>
           <div className="glass-panel rounded-sm p-8 sm:p-10">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8 pb-6 border-b hairline">
-              <div>
-                <span className="font-mono text-[10px] text-[#7547e8] tracking-[0.22em] uppercase block mb-2">
-                  // Collaborative Legacy
-                </span>
-                <h4 className="font-display font-semibold text-2xl sm:text-3xl text-[#f2f5f7]">
-                  Past Ecosystem Partners
-                </h4>
-              </div>
-              <span className="font-mono text-[10px] tracking-[0.2em] text-[#5c6673] uppercase shrink-0">
-                Verified Collaborators
-              </span>
+            <div className="mb-8 border-b hairline pb-6">
+              <h4 className="font-display text-2xl font-semibold text-[#f2f5f7] sm:text-3xl">
+                Previous Partners
+              </h4>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -112,15 +101,9 @@ export function Sponsors() {
                         </span>
                         <ShieldCheck className="w-4 h-4 text-[#27dccb] shrink-0" />
                       </div>
-                      <div className="font-mono text-[11px] text-[#7547e8] tracking-wide mb-1">
+                      <div className="font-mono text-xs tracking-wide text-[#7547e8]">
                         {partner.role}
                       </div>
-                      <div className="text-xs text-[#5c6673] leading-relaxed">
-                        {partner.note}
-                      </div>
-                    </div>
-                    <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ArrowUpRight className="w-5 h-5 text-[#7547e8]" />
                     </div>
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7547e8]/30 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />

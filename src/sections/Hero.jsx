@@ -52,9 +52,7 @@ export function Hero() {
             className="mb-7 flex items-center gap-3"
           >
             <span className="h-px w-10 bg-gradient-to-r from-[#7547e8] to-[#315bff]" />
-            <span className="hud-tag">
-              {eventData.chapter} // {eventData.edition}
-            </span>
+            <span className="hud-tag">{eventData.institutionShort}</span>
           </motion.div>
 
           <h1 className="hero-title">
@@ -70,7 +68,7 @@ export function Hero() {
             transition={{ duration: 1, ease: EASE_OUT_EXPO, delay: 0.8 }}
             className="mt-7 max-w-md lead"
           >
-            One arena. Limitless possibilities.
+            {eventData.supportingText}
           </motion.p>
 
           <motion.div
@@ -93,7 +91,7 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.2, delay: 1.15 }}
-            className="mt-11 flex flex-wrap items-center gap-x-7 gap-y-3 font-mono text-[11px] tracking-[0.18em] uppercase text-[#5c6673]"
+            className="mt-11 flex flex-wrap items-center gap-x-7 gap-y-3 font-mono text-[11px] tracking-[0.18em] uppercase text-[#7b8494]"
           >
             <span className="flex items-center gap-2">
               <MapPin className="w-3.5 h-3.5 text-[#7547e8]" />
@@ -108,17 +106,14 @@ export function Hero() {
           </motion.div>
         </div>
 
-        <div className="lg:col-span-5 relative hidden lg:block pointer-events-none" aria-hidden="true">
-          <div className="relative h-[560px] xl:h-[620px]">
-            <div className="absolute top-2 right-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8b93a7]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#7547e8] pulse-dot" />
-              FIG. 01 / INTERLOCKED CORE
-            </div>
-            <div className="absolute bottom-4 left-2 border-l border-[#27dccb]/50 pl-3">
-              <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#8b93a7]">
-                Interlocking beams // compound sculpture
-              </div>
-            </div>
+        <div className="lg:col-span-5 relative pointer-events-none" aria-hidden="true">
+          <div className="relative h-[300px] sm:h-[420px] xl:h-[540px] flex items-center justify-center">
+            <img
+              src="/logos/hackathon-2027-logo.png"
+              alt="WCE Hackathon 2027"
+              className="h-[78%] w-auto max-w-[85%] object-contain select-none"
+              draggable={false}
+            />
           </div>
         </div>
 
@@ -130,8 +125,8 @@ export function Hero() {
         transition={{ duration: 1, delay: 1.35 }}
         className="container-custom relative z-10 pb-8"
       >
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t hairline pt-5 font-mono text-[10px] tracking-[0.22em] uppercase text-[#5c6673]">
-          <span>{eventData.tagline}</span>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-t hairline pt-5 font-mono text-[11px] tracking-[0.18em] uppercase text-[#7b8494]">
+          <span>{eventData.symposium}</span>
           <span className="flex items-center gap-2">
             <span className="status-dot pulse-dot" />
             {eventData.registrationStatus}

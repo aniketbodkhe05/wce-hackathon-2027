@@ -36,13 +36,13 @@ function FaqItem({ item, index }) {
           className="w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left"
         >
           <div className="flex items-center gap-3">
-            <HelpCircle className={`w-5 h-5 shrink-0 transition-colors duration-300 ${open ? 'text-[#7547e8]' : 'text-[#5c6673]'}`} />
+            <HelpCircle className={`w-5 h-5 shrink-0 transition-colors duration-300 ${open ? 'text-[#7547e8]' : 'text-[#7b8494]'}`} />
             <span className={`font-display font-semibold text-base sm:text-lg transition-colors duration-300 ${open ? 'text-[#7547e8]' : 'text-white'}`}>
               {item.question}
             </span>
           </div>
           <ChevronDown
-            className={`w-5 h-5 shrink-0 text-[#5c6673] transition-transform duration-500 ${open ? 'rotate-180 text-[#7547e8]' : ''}`}
+            className={`w-5 h-5 shrink-0 text-[#7b8494] transition-transform duration-500 ${open ? 'rotate-180 text-[#7547e8]' : ''}`}
           />
         </button>
       </h3>
@@ -57,7 +57,7 @@ function FaqItem({ item, index }) {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.5, ease: EASE_OUT_EXPO }}
           >
-            <div className="relative z-10 px-5 sm:px-6 pb-6 text-sm sm:text-base text-[#929caa] leading-relaxed border-t hairline pt-4">
+            <div className="relative z-10 px-5 sm:px-6 pb-6 text-sm sm:text-base text-[#a3adba] leading-relaxed border-t hairline pt-4">
               {item.answer}
             </div>
           </motion.div>
@@ -87,11 +87,8 @@ export function FAQ() {
       />
       <div className="container-custom relative z-10">
         <SectionHeading
-          index="SEC // 08"
-          kicker="Knowledge Base"
-          title="Questions,"
-          accent="answered."
-          description="Eligibility, rules, logistics."
+          title="FAQ"
+          description="Eligibility, team rules, prizes, and event logistics."
         />
 
         <Reveal delay={0.08}>
@@ -104,7 +101,7 @@ export function FAQ() {
                 className={`relative px-4 py-2 rounded-sm font-mono text-[11px] tracking-[0.16em] uppercase border transition-all duration-300 overflow-hidden ${
                   category === cat.id
                     ? 'bg-[#7547e8] text-[#05060b] border-[#7547e8] font-bold'
-                    : 'hairline text-[#929caa] hover:text-white hover:border-white/20'
+                    : 'hairline text-[#a3adba] hover:text-white hover:border-white/20'
                 }`}
               >
                 <span className="relative z-10">{cat.label}</span>
@@ -124,19 +121,24 @@ export function FAQ() {
 
         <Reveal delay={0.1}>
           <div className="mt-12 max-w-4xl glass-panel rounded-sm p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="relative font-mono text-xs text-[#929caa] flex items-center gap-2">
-              <HelpCircle className="w-4 h-4 text-[#7547e8]" />
-              <span className="text-white font-bold block mb-1">Unresolved questions?</span>
-              <a href={`mailto:${eventData.contactEmail}`} className="text-[#7547e8] hover:underline">
-                {eventData.contactEmail}
-              </a>
+            <div className="relative flex items-start gap-3 font-mono text-sm text-[#a3adba]">
+              <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#7547e8]" />
+              <div className="flex flex-col gap-1">
+                <span className="font-bold text-white">Need help?</span>
+                <a
+                  href={`mailto:${eventData.contactEmail}`}
+                  className="text-[#7547e8] hover:underline"
+                >
+                  {eventData.contactEmail}
+                </a>
+              </div>
             </div>
             <a
               href={`mailto:${eventData.contactEmail}?subject=${encodeURIComponent('WCE Hackathon 2027 — Query')}`}
               className="btn-secondary shrink-0 !py-3"
             >
               <Mail className="w-4 h-4" />
-              Contact Desk
+              Email us
             </a>
           </div>
         </Reveal>

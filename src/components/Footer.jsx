@@ -1,6 +1,6 @@
 import { eventData } from '../data/event';
 import { Reveal } from './Reveal';
-import { Heart, Mail, MapPin } from 'lucide-react';
+import { Mail, MapPin } from 'lucide-react';
 
 const MAP_QUERY = 'Walchand College of Engineering, Sangli, Maharashtra, India';
 const MAP_EMBED_URL = `https://maps.google.com/maps?q=${encodeURIComponent(
@@ -12,15 +12,15 @@ const ACM_WEBSITE = 'https://wce.acm.org';
 const navigationColumns = [
   [
     { label: 'Home', href: '#hero' },
-    { label: 'Glimpses', href: '#highlights' },
+    { label: 'GLIMPSES', href: '#highlights' },
+    { label: 'Tracks', href: '#domains' },
     { label: 'Prizes', href: '#prizes' },
-    { label: 'Organizers', href: '#about' },
   ],
   [
     { label: 'About', href: '#about' },
     { label: 'Timeline', href: '#timeline' },
     { label: 'Sponsors', href: '#sponsors' },
-    { label: 'Tracks', href: '#domains' },
+    { label: 'FAQ', href: '#faq' },
   ],
 ];
 
@@ -115,7 +115,7 @@ export function Footer() {
           <Reveal delay={0.16} className="w-full md:col-span-2 lg:col-span-1">
             <div className="w-full md:mx-auto md:max-w-md lg:mx-0 lg:max-w-none">
               <h3 className="bg-gradient-to-r from-[#00BFFF] via-[#27dccb] to-[#b9f36b] bg-clip-text text-center font-display text-2xl font-bold uppercase tracking-tight text-transparent lg:text-left">
-                WCE Hackathon 2026
+                WCE Hackathon 2027
               </h3>
 
               <nav
@@ -140,7 +140,7 @@ export function Footer() {
               </nav>
 
               <div className="mt-8">
-                <h4 className="text-center font-mono text-[10px] uppercase tracking-[0.35em] text-[#9ca3af] lg:text-left">
+                <h4 className="text-center font-mono text-[11px] uppercase tracking-[0.35em] text-[#9ca3af] lg:text-left">
                   Follow Us
                 </h4>
                 <div className="mt-4 flex items-center justify-center gap-2.5 lg:justify-start">
@@ -169,18 +169,8 @@ export function Footer() {
         </div>
 
         <div className="mt-14 border-t border-white/10 pt-8 text-center">
-          <p className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-1 text-xs text-[#9ca3af] sm:text-[13px]">
-            <span>Designed and Developed with</span>
-            <Heart
-              className="h-3.5 w-3.5 fill-[#ef4444] text-[#ef4444]"
-              aria-hidden="true"
-            />
-            <span className="sr-only">love</span>
-            <span>by</span>
-            <span className="font-medium text-[#00BFFF]">WCE ACM Web Developers</span>
-          </p>
-          <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-[#6b7280]">
-            © WCE ACM HACKATHON 2026
+          <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.2em] text-[#8b93a0]">
+            © WCE ACM HACKATHON 2027
           </p>
         </div>
       </div>

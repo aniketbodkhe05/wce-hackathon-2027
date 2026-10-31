@@ -49,22 +49,18 @@ export function Navbar() {
         <div className="container-custom flex items-center justify-between">
           <a
             href="#hero"
-            className="flex items-center gap-3 group"
+            className="flex shrink-0 items-center transition-opacity duration-300 hover:opacity-85"
             aria-label="WCE Hackathon 2027 — home"
           >
             <img
-              src="/logos/hackathon-logo.png"
-              alt="WCE Hackathon"
-              className="w-8 h-8 object-contain"
+              src="/logos/hackathon-2027-logo.png"
+              alt="WCE Hackathon 2027"
+              className="h-8 w-auto max-w-[140px] object-contain sm:h-9 sm:max-w-[160px] lg:h-10 lg:max-w-[180px]"
+              width="2446"
+              height="861"
+              loading="eager"
+              decoding="async"
             />
-            <div className="hidden sm:block">
-              <div className="font-display font-semibold text-xs tracking-[0.18em] text-white uppercase leading-none group-hover:text-[#7547e8] transition-colors">
-                WCE Hackathon
-              </div>
-              <div className="font-mono text-[10px] text-[#7547e8] tracking-[0.2em] mt-1">
-                2027 // VISION
-              </div>
-            </div>
           </a>
 
           <nav
@@ -78,7 +74,7 @@ export function Navbar() {
                 className={`px-4 py-1.5 rounded-full font-mono text-[11px] tracking-[0.08em] uppercase shrink-0 transition-colors duration-300 ${
                   active === item.id
                     ? 'text-[#7547e8] bg-[rgba(117,71,232,0.1)]'
-                    : 'text-[#929caa] hover:text-white'
+                    : 'text-[#a3adba] hover:text-white'
                 }`}
               >
                 {item.label}
@@ -93,7 +89,7 @@ export function Navbar() {
             </a>
             <button
               onClick={() => setOpen(true)}
-              className="lg:hidden p-2 text-[#929caa] hover:text-white border hairline rounded-sm transition-colors"
+              className="lg:hidden p-2 text-[#a3adba] hover:text-white border hairline rounded-sm transition-colors"
               aria-label="Open menu"
             >
               <Menu className="w-5 h-5" />
@@ -120,7 +116,7 @@ export function Navbar() {
               </span>
               <button
                 onClick={() => setOpen(false)}
-                className="p-2 text-[#929caa] hover:text-white border hairline rounded-sm transition-colors"
+                className="p-2 text-[#a3adba] hover:text-white border hairline rounded-sm transition-colors"
                 aria-label="Close menu"
               >
                 <X className="w-5 h-5" />
@@ -140,7 +136,7 @@ export function Navbar() {
                   <span className="font-display font-medium text-2xl sm:text-3xl tracking-tight text-white group-hover:text-[#7547e8] transition-colors">
                     {item.label}
                   </span>
-                  <span className="font-mono text-xs text-[#5c6673]">
+                  <span className="font-mono text-xs text-[#7b8494]">
                     {String(i + 1).padStart(2, '0')}
                   </span>
                 </motion.a>

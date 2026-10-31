@@ -36,11 +36,8 @@ export function Timeline() {
       />
       <div className="container-custom relative z-10">
         <SectionHeading
-          index="SEC // 04"
-          kicker="Chronology"
-          title="Five phases."
-          accent="One conquest."
-          description="From abstract submission to the grand jury demo."
+          title="TIMELINE"
+          description="From abstract submission to final awards."
         />
 
         {/* Desktop: Horizontal timeline with connecting line */}
@@ -66,8 +63,8 @@ export function Timeline() {
 
                   {/* Phase label */}
                   <div className="text-center mb-4">
-                    <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-[#7547e8]">
-                      {phase.phase?.split('//')[1]?.trim() ?? phase.phase}
+                    <span className="font-mono text-[11px] tracking-[0.18em] uppercase text-[#7547e8]">
+                      {phase.phase}
                     </span>
                   </div>
 
@@ -85,22 +82,17 @@ export function Timeline() {
                   
                   {/* Timeframe */}
                   <div className="text-center mb-4">
-                    <span className="inline-flex w-fit rounded-sm border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-[#a5aabd]">
+                    <span className="inline-flex w-fit rounded-sm border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider text-[#a5aabd]">
                       {phase.timeframe}
                     </span>
                   </div>
 
-                  {/* Description */}
-                  <p className="text-sm leading-relaxed text-[#a5aabd] text-center mb-4 px-2">
-                    {phase.description}
-                  </p>
-
                   {/* Highlights - minimal */}
                   <ul className="space-y-2 px-2">
                     {phase.highlights.slice(0, 2).map((h) => (
-                      <li key={h} className="flex items-center justify-center gap-2 text-[12px] leading-snug text-[#8b93a7]">
-                        <span className="w-1.5 h-1.5 shrink-0 rounded-full bg-[#315bff]" />
-                        <span className="truncate max-w-[200px]">{h}</span>
+                      <li key={h} className="flex items-start justify-center gap-2 text-[13px] leading-relaxed text-[#a3adba]">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#315bff]" />
+                        <span>{h}</span>
                       </li>
                     ))}
                   </ul>
@@ -136,8 +128,8 @@ export function Timeline() {
                         <PhaseIconSmall step={phase.step} />
                       </div>
                       <div>
-                        <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-[#7547e8] block">
-                          {phase.phase?.split('//')[1]?.trim() ?? phase.phase}
+                        <span className="font-mono text-[11px] tracking-[0.18em] uppercase text-[#7547e8] block">
+                          {phase.phase}
                         </span>
                         <h3 className="font-display text-xl font-semibold leading-snug text-[#f5f6fa] mt-0.5">
                           {phase.title}
@@ -145,18 +137,14 @@ export function Timeline() {
                       </div>
                     </div>
                     
-                    <p className="text-sm leading-relaxed text-[#a5aabd] mb-3 max-w-xl">
-                      {phase.description}
-                    </p>
-                    
-                    <span className="inline-flex rounded-sm border border-white/10 bg-white/[0.03] px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-[#a5aabd] mb-3">
+                    <span className="mb-3 inline-flex rounded-sm border border-white/10 bg-white/[0.03] px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-[#a5aabd]">
                       {phase.timeframe}
                     </span>
                     
-                    <ul className="space-y-1.5 pl-2 border-l border-white/10 ml-1">
-                      {phase.highlights.slice(0, 3).map((h) => (
-                        <li key={h} className="flex items-center gap-2 text-[12px] leading-snug text-[#8b93a7]">
-                          <span className="w-1.5 h-1.5 shrink-0 rounded-full bg-[#315bff]" />
+                    <ul className="ml-1 space-y-1.5 border-l border-white/10 pl-2">
+                      {phase.highlights.slice(0, 2).map((h) => (
+                        <li key={h} className="flex items-start gap-2 text-[13px] leading-relaxed text-[#a3adba]">
+                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#315bff]" />
                           <span>{h}</span>
                         </li>
                       ))}

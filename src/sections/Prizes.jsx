@@ -25,11 +25,8 @@ export function Prizes() {
 
       <div className="container-custom relative z-10">
         <SectionHeading
-          index="SEC // 05"
-          kicker="Honors"
-          title="Engineered"
-          accent="glory."
-          description="Trophies, career acceleration, national citations."
+          title="PRIZES"
+          description="Cash prizes, internships, and certificates."
         />
 
         {/* Flagship award - unique layout */}
@@ -41,7 +38,7 @@ export function Prizes() {
             />
             <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-10 items-center p-8 sm:p-12 lg:p-16">
               <div className="lg:col-span-7 relative z-10">
-                <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#27dccb]">
+                <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-[#27dccb]">
                   {featured.category}
                 </span>
                 <h3 className="mt-5 font-display text-3xl font-semibold leading-[1.05] text-[#f5f6fa] sm:text-4xl lg:text-5xl">
@@ -118,7 +115,7 @@ export function Prizes() {
                           </span>
                         ))}
                       </div>
-                      <span className="mt-4 font-mono text-[10px] uppercase tracking-[0.18em] text-[#6b7488] block">
+                      <span className="mt-4 font-mono text-[11px] uppercase tracking-[0.18em] text-[#7b8494] block">
                         {prize.category}
                       </span>
                     </div>
@@ -136,7 +133,7 @@ export function Prizes() {
                           {prize.description}
                         </p>
                       </div>
-                      <span className="mt-4 font-mono text-[10px] uppercase tracking-[0.18em] text-[#6b7488] block">
+                      <span className="mt-4 font-mono text-[11px] uppercase tracking-[0.18em] text-[#7b8494] block">
                         {prize.category}
                       </span>
                     </div>

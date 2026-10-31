@@ -19,8 +19,8 @@
 
   /* Text */
   --color-mist: #f2f5f7;
-  --color-ash: #929caa;
-  --color-smoke: #5c6673;
+  --color-ash: #a3adba;
+  --color-smoke: #7b8494;
 
   /* Type */
   --font-display: "Space Grotesk", system-ui, sans-serif;
@@ -160,9 +160,9 @@ body {
   align-items: center;
   gap: 0.65rem;
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--color-violet);
 }
@@ -175,8 +175,8 @@ body {
 
 .mono-label {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.2em;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-smoke);
 }
@@ -315,9 +315,9 @@ body {
   align-items: center;
   gap: 0.5rem;
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-violet);
 }
@@ -330,8 +330,8 @@ body {
 
 .tick-label {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.2em;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--color-smoke);
 }

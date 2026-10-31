@@ -4,19 +4,18 @@ import { eventData } from '../data/event';
 import { SectionHeading } from '../components/SectionTag';
 import { Reveal } from '../components/Reveal';
 import { EASE_OUT_EXPO } from '../lib/easing';
-import { ArrowUpRight, Terminal } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 
 const tracks = [
-  { id: 'novice', name: 'Novice', code: 'TRK-A', audience: '1st & 2nd Year' },
-  { id: 'expert', name: 'Expert', code: 'TRK-B', audience: '3rd & 4th Year+' },
+  { id: 'novice', name: 'Novice', audience: '1st & 2nd Year' },
+  { id: 'expert', name: 'Expert', audience: '3rd & 4th Year+' },
 ];
 
 function DomainArtifact() {
   return (
     <div
+      aria-hidden="true"
       className="relative w-full h-[400px] sm:h-[500px] lg:h-[600px] rounded-sm border border-white/10 bg-white/[0.02] backdrop-blur-sm overflow-hidden"
-      role="img"
-      aria-label="Interlocked geometric artifact representing the engineering domains"
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,rgba(117,71,232,0.22),transparent_60%)]" />
       <div className="absolute left-1/2 top-1/2 h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2">
@@ -39,17 +38,14 @@ export function Challenges() {
   return (
     <section
       id="domains"
-      aria-label="Challenge domains"
+      aria-label="Tracks and problem statements"
       className="relative section-pad overflow-hidden"
     >
       <div className="container-custom relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
           <div className="lg:col-span-7">
             <SectionHeading
-              index="SEC // 03"
-              kicker="Mission Dossiers"
-              title="Choose your"
-              accent="battlefield."
+              title="TRACKS"
               description="Nine problem statements across two tracks."
             />
 
@@ -68,14 +64,7 @@ export function Challenges() {
                           : 'hairline bg-white/[0.02] hover:border-white/20'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <span
-                          className={`font-mono text-[10px] tracking-[0.24em] ${
-                            isActive ? 'text-[#7547e8]' : 'text-[#5c6673]'
-                          }`}
-                        >
-                          {t.code}
-                        </span>
+                      <div className="flex items-center">
                         <span
                           className={`w-2 h-2 rounded-full ${
                             isActive ? 'bg-[#7547e8] pulse-dot' : 'bg-[#1b2430]'
@@ -84,12 +73,12 @@ export function Challenges() {
                       </div>
                       <div
                         className={`font-display font-semibold text-2xl mt-2 transition-colors duration-500 ${
-                          isActive ? 'text-white' : 'text-[#929caa] group-hover:text-white'
+                          isActive ? 'text-white' : 'text-[#a3adba] group-hover:text-white'
                         }`}
                       >
                         {t.name}
                       </div>
-                      <div className="font-mono text-[10px] text-[#5c6673] tracking-[0.14em] mt-1 uppercase">
+                      <div className="font-mono text-[11px] text-[#7b8494] tracking-[0.14em] mt-1 uppercase">
                         {t.audience}
                       </div>
                       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7547e8]/30 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
@@ -117,14 +106,14 @@ export function Challenges() {
                     <div className="absolute inset-0 bg-gradient-to-br from-[#7547e8]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <div className="relative z-10">
                       <div className="flex items-center justify-between mb-5">
-                        <span className="font-mono text-[10px] text-[#7547e8] tracking-[0.2em]">
-                          M.SN // 0{i + 1}
+                        <span className="font-mono text-[11px] text-[#7547e8] tracking-[0.18em] uppercase">
+                          0{i + 1}
                         </span>
                         <div className="flex gap-1.5">
                           {m.tags.slice(0, 2).map((tag) => (
                             <span
                               key={tag}
-                              className="px-2 py-0.5 font-mono text-[9px] tracking-wider text-[#929caa] bg-white/[0.04] border hairline rounded-sm uppercase"
+                              className="px-2 py-0.5 font-mono text-[11px] tracking-wider text-[#a3adba] bg-white/[0.04] border hairline rounded-sm uppercase"
                             >
                               {tag}
                             </span>
@@ -140,12 +129,6 @@ export function Challenges() {
                         {m.tagline}
                       </p>
 
-                      <div className="mt-6 pt-4 border-t hairline flex items-center justify-between">
-                        <span className="font-mono text-[10px] tracking-[0.2em] text-[#5c6673] uppercase">
-                          Brief // 2027
-                        </span>
-                        <ArrowUpRight className="w-4 h-4 text-[#7547e8] opacity-0 -translate-x-1 translate-y-1 group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 transition-all duration-500" />
-                      </div>
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7547e8]/30 to-transparent transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                   </article>
@@ -156,14 +139,6 @@ export function Challenges() {
 
           <div className="lg:col-span-5 flex flex-col items-center justify-start">
             <Reveal delay={0.2}>
-              <div className="w-full mb-5">
-                <div className="font-mono text-[10px] text-[#7547e8] tracking-[0.2em] uppercase mb-3">
-                  Engineering Sculpture // Model 02
-                </div>
-                <h3 className="font-display font-semibold text-xl sm:text-2xl text-[#f2f5f7]">
-                  Interlocked Geometric Artifact
-                </h3>
-              </div>
               <DomainArtifact />
             </Reveal>
           </div>
