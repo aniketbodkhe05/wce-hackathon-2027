@@ -1,66 +1,78 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import {
-  InterlockedRings,
-  ImpossibleFrames,
-  TrefoilTorque,
-} from '../three/ImpossibleSculptures';
+import { Environment, Lightformer } from '@react-three/drei';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Sculpture } from '../three/Sculptures3D';
+import { MODELS } from '../three/models';
+import { drive, TRACK } from '../three/scrollState';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
+const damp = Math.min;
 
-function seeded(seed) {
-  let s = seed;
-  return () => {
-    s = (s * 16807) % 2147483647;
-    return (s - 1) / 2147483646;
-  };
+function useCinematicDirector() {
+  useEffect(() => {
+    const el = document.getElementById('main-content');
+    const cue = gsap.timeline({
+      scrollTrigger: {
+        trigger: el || document.body,
+        start: 'top top',
+        end: 'bottom bottom',
+        scrub: 1.0,
+        onUpdate: (self) => {
+          drive.p = clamp01(self.progress);
+        },
+      },
+    });
+
+    cue
+      .to(drive, { camZ: 15.9, rimBoost: 1.15, duration: 1, ease: 'power2.inOut' })
+      .to(drive, { camZ: 17.1, rimBoost: 0.96, duration: 1, ease: 'power2.inOut' })
+      .to(drive, { camZ: 15.5, rimBoost: 1.2, duration: 1, ease: 'power2.inOut' })
+      .to(drive, { camZ: 17.2, rimBoost: 1.0, duration: 1, ease: 'power2.inOut' })
+      .to(drive, { camZ: 16.0, rimBoost: 1.12, duration: 1, ease: 'power2.inOut' })
+      .to(drive, { camZ: 17.0, rimBoost: 0.98, duration: 1, ease: 'power2.inOut' })
+      .to(drive, { camZ: 15.8, rimBoost: 1.16, duration: 1, ease: 'power2.inOut' })
+      .to(drive, { camZ: 16.8, rimBoost: 1.0, duration: 1, ease: 'power2.inOut' });
+
+    return () => {
+      cue.scrollTrigger?.kill();
+      cue.kill();
+    };
+  }, []);
 }
 
-function Motes({ count = 90 }) {
-  const points = useRef();
-  const positions = useMemo(() => {
-    const rand = seeded(1337);
-    const arr = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      arr[i * 3] = (rand() - 0.5) * 46;
-      arr[i * 3 + 1] = rand() * 46 - 30;
-      arr[i * 3 + 2] = -20 + rand() * 18;
-    }
-    return arr;
-  }, [count]);
-
-  useFrame((state) => {
-    if (points.current) {
-      points.current.rotation.y = state.clock.elapsedTime * 0.006;
-      points.current.position.y = Math.sin(state.clock.elapsedTime * 0.05) * 1.2;
-    }
-  });
-
+/* One model placed in world space */
+function Piece({ model, position, scale, iso = 0.6, yaw = 0.8, speed = 0.5, phase = 0, spin = 0.05, ampY = 0.26, rotation }) {
+  const activeFrom = Math.max(0, -position[1] / TRACK - 0.04);
   return (
-    <points ref={points}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        color="#5a4ce8"
-        size={0.045}
-        transparent
-        opacity={0.3}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-        sizeAttenuation
+    <group position={position} rotation={rotation}>
+      <Sculpture
+        model={model}
+        scale={scale}
+        iso={iso}
+        yaw={yaw}
+        speed={speed}
+        phase={phase}
+        spin={spin}
+        ampY={ampY}
+        activeFrom={activeFrom}
       />
-    </points>
+    </group>
   );
 }
 
 function EnvironmentRig() {
   const env = useRef();
-  const look = useRef({ progress: 0, target: 0 });
+  const rim = useRef();
   const pointer = useRef({ x: 0, y: 0 });
   const { size } = useThree();
   const mobile = size.width < 768;
+
+  useCinematicDirector();
 
   useEffect(() => {
     const onPointerMove = (event) => {
@@ -73,99 +85,118 @@ function EnvironmentRig() {
 
   useFrame((state, delta) => {
     const { camera } = state;
-    const d = Math.min(delta, 0.05);
-
-    const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-    const target = clamp01(window.scrollY / max);
-    look.current.target = target;
-    look.current.progress += (target - look.current.progress) * Math.min(1, d * 3.2);
-
-    const p = look.current.progress;
+    const d = damp(delta, 0.05);
+    const t = state.clock.elapsedTime;
+    const p = drive.p;
 
     if (env.current) {
-      env.current.position.y = p * (mobile ? 30 : 31);
-      env.current.position.x = Math.sin(p * Math.PI * 1.4) * (mobile ? 0.3 : 0.9);
-      env.current.rotation.y = p * 0.14;
-      env.current.rotation.z = Math.sin(p * Math.PI) * 0.01;
+      env.current.position.y = p * TRACK;
+      env.current.position.x = Math.sin(p * Math.PI * 1.4) * (mobile ? 0.3 : 0.85);
+      env.current.rotation.y = p * 0.1;
     }
 
     camera.position.x +=
-      (pointer.current.x * (mobile ? 0.45 : 0.85) + p * 0.35 - camera.position.x) *
+      (pointer.current.x * (mobile ? 0.35 : 0.7) + p * 0.28 - camera.position.x) *
       Math.min(1, d * 1.8);
     camera.position.y +=
-      (pointer.current.y * -0.35 - p * 0.5 - camera.position.y) * Math.min(1, d * 1.8);
-    camera.position.z = 18 - p * 1.4;
-    camera.lookAt(0, -p * 0.45, -5);
+      (1.6 + pointer.current.y * -0.28 - p * 0.45 - camera.position.y) * Math.min(1, d * 1.8);
+    camera.position.z += (drive.camZ - camera.position.z) * Math.min(1, d * 1.4);
+    camera.lookAt(0, -p * 0.4 - 0.35, -5);
+
+    if (rim.current) {
+      rim.current.intensity = 1.0 * drive.rimBoost * (0.95 + Math.sin(t * 0.35) * 0.05);
+    }
   });
 
   return (
     <>
-      <fog attach="fog" args={['#05060b', 24, 72]} />
+      {/* Fog starts well beyond the sculpture band and fades to a lifted
+          tone — far models get depth, never dissolve into blackness */}
+      <fog attach="fog" args={['#101623', 44, 150]} />
 
-      {/* Cinematic violet / electric-blue studio lighting */}
-      <ambientLight intensity={0.5} color="#2a2345" />
-      <hemisphereLight args={['#5a4ce8', '#04070c', 1.0]} />
+      {/* Cinematic dark-studio rig — cold key, violet/blue gradient fills,
+          turquoise rim. Omnidirectional base lift so rotating metals never
+          go black: every hemisphere keeps light + env response. */}
+      <ambientLight intensity={0.55} color="#2a3a52" />
+      <hemisphereLight args={['#3c4d6e', '#1a222e', 0.85]} />
 
-      <directionalLight position={[10, 13, 9]} intensity={2.7} color="#c4ccff" />
-      <directionalLight position={[-12, -2, 8]} intensity={1.7} color="#7547e8" />
-      <directionalLight position={[0, -11, 6]} intensity={1.4} color="#27dccb" />
-      <directionalLight position={[-6, 9, -8]} intensity={1.1} color="#315bff" />
+      <directionalLight position={[7, 11, 7]} intensity={1.9} color="#cfdcec" />
+      <directionalLight position={[5, -5, 9]} intensity={0.45} color="#4a6fd0" />
+      <directionalLight position={[-8, -2, 6]} intensity={0.5} color="#7547e8" />
+      <directionalLight ref={rim} position={[-5, 8, -9]} intensity={1.0} color="#7de8dc" />
+      <directionalLight position={[0, 7, 11]} intensity={0.35} color="#b9f36b" />
+      {/* Under/behind soft fills — cover the remaining dark hemispheres */}
+      <directionalLight position={[0, -9, -7]} intensity={0.5} color="#46597c" />
+      <directionalLight position={[5, 0, -11]} intensity={0.3} color="#5a4799" />
+
+      <Environment resolution={128} frames={1}>
+        {/* Gradient studio: bright chrome strip, violet-to-blue walls moving
+            color across chrome/iridescent surfaces as models drift.
+            Base dome lifted so shadow-facing metals always reflect light. */}
+        <color attach="background" args={['#1a1d26']} />
+        <Lightformer intensity={2.6} color="#cdd6e4" position={[0, 7, -8]} scale={[9, 2.6, 1]} />
+        <Lightformer intensity={1.5} color="#8b79e6" position={[-7, 1, 4]} scale={[4, 8, 1]} />
+        <Lightformer intensity={1.1} color="#3d5cbe" position={[7, -2, 4]} scale={[4, 8, 1]} />
+        <Lightformer form="ring" intensity={0.8} color="#4dc0b4" position={[-4, -5, 6]} scale={4} />
+        <Lightformer intensity={0.85} color="#3d5468" position={[0, -7, -6]} scale={[9, 6, 1]} />
+        <Lightformer intensity={0.6} color="#5b6577" position={[0, -2, 11]} scale={[10, 7, 1]} />
+        <Lightformer intensity={0.65} color="#49506a" position={[-9, 6, 0]} scale={[6, 6, 1]} />
+        <Lightformer intensity={0.65} color="#4a4a6e" position={[9, 5, 0]} scale={[6, 6, 1]} />
+      </Environment>
 
       <group ref={env}>
-        <group
-          position={mobile ? [1.5, 1.0, -6] : [5.2, 1.4, -3.5]}
-          scale={mobile ? 0.62 : 1.35}
-        >
-          <InterlockedRings accent="#27dccb" />
-          <pointLight position={[0, 0, 1.5]} intensity={12} distance={10} decay={2} color="#27dccb" />
-        </group>
+        {mobile ? (
+          <>
+            <Piece model={MODELS.impossibleCube} position={[0.6, 0.6, -6]} scale={0.62} phase={0.2} />
+            <Piece model={MODELS.spiralTower} position={[-0.8, -11.2, -6]} scale={0.55} phase={2.1} speed={0.45} />
+            <Piece model={MODELS.archBridge} position={[0.4, -22.5, -6]} scale={0.62} phase={3.4} />
+            <Piece model={MODELS.trussPyramid} position={[-0.6, -33.7, -6]} scale={0.6} phase={4.8} />
+            <Piece model={MODELS.nestedCage} position={[0.4, -45, -6]} scale={0.6} phase={6.1} />
+            <Piece model={MODELS.stairLoop} position={[-0.4, -56.2, -6]} scale={0.58} phase={7.4} />
+          </>
+        ) : (
+          <>
+            {/* ——— HERO ——— */}
+            <Piece model={MODELS.impossibleCube} position={[4.5, 0.7, -7]} scale={1.5} iso={0.55} yaw={0.7} phase={0.2} />
+            <Piece model={MODELS.triPortal} position={[-3.1, 3.4, -10]} scale={0.62} iso={0.62} yaw={0.9} phase={1.3} speed={0.42} />
+            <Piece model={MODELS.asymFork} position={[8.9, 3.2, -12]} scale={0.7} iso={0.58} yaw={0.5} phase={2.2} speed={0.38} />
 
-        <group
-          position={mobile ? [-1.2, -14.5, -7] : [-7.8, -13.8, -6.5]}
-          scale={mobile ? 0.6 : 1.28}
-        >
-          <ImpossibleFrames accent="#7547e8" />
-          <pointLight position={[0, 0, 1.5]} intensity={12} distance={11} decay={2} color="#7547e8" />
-        </group>
+            {/* ——— ABOUT ——— */}
+            <Piece model={MODELS.spiralTower} position={[-7.5, -6.2, -6]} scale={0.9} iso={0.55} yaw={0.75} phase={2.9} />
+            <Piece model={MODELS.opticalFrame} position={[8.3, -8.0, -13]} scale={0.72} iso={0.6} yaw={1.0} phase={3.6} speed={0.4} />
 
-        <group
-          position={mobile ? [1.4, -27.5, -7] : [2.4, -22.6, -6.5]}
-          scale={mobile ? 0.58 : 1.15}
-        >
-          <TrefoilTorque accent="#315bff" />
-          <pointLight position={[0, 0, 1.5]} intensity={12} distance={11} decay={2} color="#315bff" />
-        </group>
+            {/* ——— HIGHLIGHTS ——— */}
+            <Piece model={MODELS.archBridge} position={[7.5, -12.5, -6]} scale={0.88} iso={0.6} yaw={0.65} phase={4.4} />
+            <Piece model={MODELS.nestedCage} position={[-8.3, -14.5, -13]} scale={0.7} iso={0.62} yaw={0.85} phase={5.1} speed={0.42} />
+
+            {/* ——— CHALLENGES ——— */}
+            <Piece model={MODELS.trussPyramid} position={[-7.2, -18.7, -6.5]} scale={0.95} iso={0.58} yaw={0.8} phase={5.9} />
+            <Piece model={MODELS.stairLoop} position={[8.0, -20.6, -13]} scale={0.68} iso={0.6} yaw={0.95} phase={6.6} speed={0.4} />
+
+            {/* ——— TIMELINE ——— */}
+            <Piece model={MODELS.nestedCage} position={[7.4, -25.0, -6]} scale={0.85} iso={0.55} yaw={0.7} phase={7.3} />
+            <Piece model={MODELS.triPortal} position={[-7.8, -26.8, -13]} scale={0.72} iso={0.62} yaw={0.9} phase={8.0} speed={0.38} />
+
+            {/* ——— PRIZES ——— */}
+            <Piece model={MODELS.stairLoop} position={[-7.2, -31.2, -6]} scale={0.85} iso={0.6} yaw={0.75} phase={8.7} />
+            <Piece model={MODELS.opticalFrame} position={[7.8, -33.0, -13]} scale={0.68} iso={0.58} yaw={1.0} phase={9.4} speed={0.36} />
+
+            {/* ——— SPONSORS / JOURNEY ——— */}
+            <Piece model={MODELS.latticeCube} position={[7.6, -37.4, -6.5]} scale={0.82} iso={0.55} yaw={0.7} phase={10.1} />
+            <Piece model={MODELS.asymFork} position={[-7.6, -43.7, -13]} scale={0.66} iso={0.6} yaw={0.85} phase={10.8} speed={0.4} />
+
+            {/* ——— FAQ ——— */}
+            <Piece model={MODELS.opticalFrame} position={[-7.4, -50.0, -6]} scale={0.8} iso={0.58} yaw={0.8} phase={11.5} />
+            <Piece model={MODELS.archBridge} position={[7.4, -51.5, -13]} scale={0.62} iso={0.6} yaw={0.65} phase={12.2} speed={0.38} />
+
+            {/* ——— FINAL CTA ——— */}
+            <Piece model={MODELS.impossibleCube} position={[4.5, -56.2, -7.5]} scale={1.35} iso={0.55} yaw={0.7} phase={12.9} />
+            <Piece model={MODELS.triPortal} position={[-6.8, -54.8, -12]} scale={0.58} iso={0.62} yaw={0.9} phase={13.6} speed={0.4} />
+          </>
+        )}
       </group>
-
-      <Motes />
     </>
   );
-}
-
-
-function ScrollScrim() {
-  const ref = useRef(null);
-
-  useEffect(() => {
-    let raf = 0;
-    const update = () => {
-      if (!ref.current) return;
-      const t = Math.min(1, window.scrollY / 620);
-      ref.current.style.opacity = String(t * 0.3);
-    };
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('scroll', onScroll);
-    };
-  }, []);
-
-  return <div ref={ref} className="absolute inset-0 bg-[#05060b] opacity-0" />;
 }
 
 function detectWebGL() {
@@ -201,31 +232,38 @@ export function GlobalScene() {
     return (
       <div
         aria-hidden="true"
-        className="fixed inset-0 z-0 pointer-events-none bg-[radial-gradient(ellipse_at_65%_25%,rgba(117,71,232,0.22),transparent_55%),radial-gradient(ellipse_at_25%_75%,rgba(49,91,255,0.18),transparent_55%),radial-gradient(ellipse_at_70%_80%,rgba(39,220,203,0.12),transparent_50%)]"
+        className="fixed inset-0 z-0 pointer-events-none"
+        style={{
+          background: '#05060b',
+        }}
       />
     );
   }
 
   return (
-    <div aria-hidden="true" className="fixed inset-0 z-0 pointer-events-none">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_68%_22%,rgba(117,71,232,0.22),transparent_52%),radial-gradient(ellipse_at_22%_68%,rgba(49,91,255,0.17),transparent_50%),radial-gradient(ellipse_at_60%_85%,rgba(39,220,203,0.12),transparent_48%)]" />
+    <div aria-hidden="true" className="fixed inset-0 z-0 pointer-events-none bg-[#05060b]">
       <Canvas
         dpr={[1, 1.5]}
-        camera={{ position: [0, 0, 18], fov: 46, near: 0.1, far: 90 }}
+        camera={{ position: [0, 0, 17.4], fov: 44, near: 0.1, far: 130 }}
         gl={{
           antialias: true,
           alpha: true,
           powerPreference: 'high-performance',
           stencil: false,
         }}
-        performance={{ min: 0.6 }}
-        frameloop={paused || reduced ? 'never' : 'always'}
+        onCreated={({ gl }) => {
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          gl.toneMappingExposure = 1.22;
+        }}
+        performance={{ min: 0.5 }}
+        frameloop={paused ? 'never' : reduced ? 'demand' : 'always'}
         style={{ background: 'transparent' }}
       >
         <EnvironmentRig />
       </Canvas>
-      <ScrollScrim />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_38%,rgba(5,6,11,0.72)_100%)]" />
+      {/* Soft compositional vignette — grounds the sculptures and keeps
+          foreground cards/headings readable (pure DOM, no render cost) */}
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_62%,rgba(5,6,11,0.32)_100%)]" />
     </div>
   );
 }

@@ -1,63 +1,19 @@
-import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowUpRight, Sparkles } from 'lucide-react';
 import { eventData } from '../data/event';
 import { Reveal } from '../components/Reveal';
-import { EASE_OUT_EXPO } from '../lib/easing';
-import { ArrowUpRight, CheckCircle2, Send, Mail, Lock, User, Building2 } from 'lucide-react';
-
-const initialForm = { name: '', email: '', college: '', track: 'novice' };
 
 export function FinalCTA() {
-  const [form, setForm] = useState(initialForm);
-  const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
-
-  const validate = () => {
-    const errs = {};
-    if (!form.name.trim()) errs.name = 'Full name is required';
-    if (!form.email.trim()) errs.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'Enter a valid email address';
-    if (!form.college.trim()) errs.college = 'Institution is required';
-    return errs;
-  };
-
-  const update = (field) => (e) => {
-    setForm((f) => ({ ...f, [field]: e.target.value }));
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: undefined }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length > 0) {
-      setErrors(errs);
-      return;
-    }
-    setSubmitted(true);
-    try {
-      localStorage.setItem(
-        'wce_hackathon_2027_interest',
-        JSON.stringify({ ...form, timestamp: new Date().toISOString() })
-      );
-    } catch {
-      // storage unavailable — registration is session-only
-    }
-  };
-
-  const inputClass = (field) =>
-    `w-full pl-12 pr-4 py-3.5 rounded-sm bg-[#0b1017] border text-white text-sm font-sans outline-none focus:ring-2 focus:ring-[#7547e8]/70 transition-all duration-300 ${
-      errors[field] ? 'border-rose-500' : 'hairline hover:border-white/20'
-    }`;
+  const unstopUrl = eventData.unstopUrl;
 
   return (
     <section
       id="register"
-      aria-label="Register interest"
-      className="relative py-28 sm:py-40 overflow-hidden"
+      aria-label="Register"
+      className="relative py-28 sm:py-36 lg:py-40 overflow-hidden"
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgba(117,71,232,0.12),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_100%,rgba(117,71,232,0.14),transparent_55%),radial-gradient(ellipse_at_20%_10%,rgba(39,220,203,0.05),transparent_50%)]"
       />
 
       <div className="container-custom relative z-10">
@@ -68,175 +24,59 @@ export function FinalCTA() {
               <br />
               <span className="text-gradient-violet">build?</span>
             </h2>
-            <p className="mt-6 mx-auto max-w-xl text-base leading-relaxed text-[#a3adba] sm:text-lg">
-              Get 2027 updates and problem statements first.
+            <p className="mt-6 mx-auto max-w-xl text-base sm:text-lg leading-relaxed text-[#a3adba]">
+              Have an idea? Bring your team and turn it into reality at WCE
+              Hackathon 2027.
             </p>
           </Reveal>
 
-          <Reveal delay={0.12}>
-            <div className="relative mt-12 tech-corners glass-panel rounded-sm p-8 sm:p-12 overflow-hidden">
+          <Reveal delay={0.14}>
+            <div className="relative mt-12 tech-corners glass-panel rounded-sm px-6 py-10 sm:px-12 sm:py-14 overflow-hidden">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-px bg-gradient-to-r from-transparent via-[#7547e8]/60 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-br from-[#7547e8]/3 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#7547e8]/5 via-transparent to-[#27dccb]/3 pointer-events-none" />
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-7 mb-8 border-b hairline relative z-10">
-                <div>
-                  <span className="mb-1.5 block font-mono text-[11px] uppercase tracking-[0.2em] text-[#7547e8]">
-                    WCE Hackathon 2027
+              <div className="relative z-10 flex flex-col items-center text-center gap-8">
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <span className="inline-flex items-center gap-2 rounded-sm border border-[#b9f36b]/25 bg-[#b9f36b]/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-[#b9f36b]">
+                    <span className="status-dot pulse-dot" />
+                    Pre-registration open
                   </span>
-                  <h3 className="font-display text-xl font-extrabold uppercase text-white sm:text-2xl">
-                    Join the interest list
-                  </h3>
+                  <span className="inline-flex items-center gap-1.5 rounded-sm border hairline bg-white/[0.03] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.2em] text-[#a3adba]">
+                    <Sparkles className="h-3 w-3 text-[#7547e8]" strokeWidth={2} />
+                    Round 1 entry — 100% free
+                  </span>
                 </div>
-                <span className="flex items-center gap-2 px-3 py-1.5 rounded-sm bg-white/[0.03] border hairline font-mono text-[11px] tracking-[0.18em] text-[#a3adba] uppercase shrink-0">
-                  <span className="w-2 h-2 rounded-full bg-[#b9f36b] pulse-dot" />
-                  Pre-registration open
-                </span>
-              </div>
 
-              <AnimatePresence mode="wait">
-                {submitted ? (
-                  <motion.div
-                    key="done"
-                    initial={{ opacity: 0, y: 18 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-                    className="relative z-10 text-center py-10"
+                <h3 className="font-display text-xl sm:text-2xl font-extrabold uppercase text-white">
+                  WCE Hackathon 2027
+                </h3>
+
+                {unstopUrl ? (
+                  <a
+                    href={unstopUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Register on Unstop (opens in a new tab)"
+                    className="btn-primary btn-lg group min-h-[48px] px-8 sm:px-10 text-base"
                   >
-                    <div className="w-14 h-14 rounded-full bg-[rgba(117,71,232,0.1)] border border-[#7547e8]/40 flex items-center justify-center mx-auto mb-6">
-                      <CheckCircle2 className="w-7 h-7 text-[#7547e8]" />
-                    </div>
-                    <h4 className="font-display font-extrabold text-3xl text-white uppercase">
-                      Interest logged
-                    </h4>
-                    <p className="mx-auto mt-4 max-w-md leading-relaxed text-[#a3adba]">
-                      {form.name.split(' ')[0]}, your interest in the{' '}
-                      <span className="font-mono text-sm text-[#7547e8]">
-                        {form.track.toUpperCase()}
-                      </span>{' '}
-                      track is saved in this browser.
-                    </p>
-                    <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-                      <a href={eventData.officialWebsite} target="_blank" rel="noopener noreferrer" className="btn-secondary">
-                        Official Portal
-                        <ArrowUpRight className="w-4 h-4" />
-                      </a>
-                      <button
-                        onClick={() => {
-                          setSubmitted(false);
-                          setForm(initialForm);
-                        }}
-                        className="font-mono text-xs text-[#a3adba] hover:text-white transition-colors uppercase tracking-[0.16em]"
-                      >
-                        Submit another
-                      </button>
-                    </div>
-                  </motion.div>
+                    REGISTER ON UNSTOP
+                    <ArrowUpRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </a>
                 ) : (
-                  <motion.form
-                    key="form"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0, y: -14 }}
-                    transition={{ duration: 0.5 }}
-                    onSubmit={handleSubmit}
-                    noValidate
-                    className="relative z-10 space-y-6"
+                  <span
+                    className="btn-primary btn-lg min-h-[48px] px-8 sm:px-10 text-base opacity-70 cursor-not-allowed select-none"
+                    aria-disabled="true"
                   >
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <div>
-                        <label htmlFor="reg-name" className="block font-mono text-[11px] tracking-[0.18em] uppercase text-[#c7cfd9] mb-2">
-                          Team lead <span className="text-[#7547e8]">*</span>
-                        </label>
-                        <div className="relative">
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7b8494] pointer-events-none" />
-                          <input
-                            id="reg-name"
-                            type="text"
-                            value={form.name}
-                            onChange={update('name')}
-                            placeholder="e.g. Aniket Bodkhe"
-                            className={inputClass('name')}
-                            aria-invalid={Boolean(errors.name)}
-                          />
-                        </div>
-                        {errors.name && <span className="text-xs text-rose-400 mt-1.5 block font-mono ml-2">{errors.name}</span>}
-                      </div>
-                      <div>
-                        <label htmlFor="reg-email" className="block font-mono text-[11px] tracking-[0.18em] uppercase text-[#c7cfd9] mb-2">
-                          Email <span className="text-[#7547e8]">*</span>
-                        </label>
-                        <div className="relative">
-                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7b8494] pointer-events-none" />
-                          <input
-                            id="reg-email"
-                            type="email"
-                            value={form.email}
-                            onChange={update('email')}
-                            placeholder="developer@college.edu"
-                            className={inputClass('email')}
-                            aria-invalid={Boolean(errors.email)}
-                          />
-                        </div>
-                        {errors.email && <span className="text-xs text-rose-400 mt-1.5 block font-mono ml-2">{errors.email}</span>}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <div>
-                        <label htmlFor="reg-college" className="block font-mono text-[11px] tracking-[0.18em] uppercase text-[#c7cfd9] mb-2">
-                          College <span className="text-[#7547e8]">*</span>
-                        </label>
-                        <div className="relative">
-                          <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7b8494] pointer-events-none" />
-                          <input
-                            id="reg-college"
-                            type="text"
-                            value={form.college}
-                            onChange={update('college')}
-                            placeholder="College of Engineering"
-                            className={inputClass('college')}
-                            aria-invalid={Boolean(errors.college)}
-                          />
-                        </div>
-                        {errors.college && <span className="text-xs text-rose-400 mt-1.5 block font-mono ml-2">{errors.college}</span>}
-                      </div>
-                      <div>
-                        <label htmlFor="reg-track" className="block font-mono text-[11px] tracking-[0.18em] uppercase text-[#c7cfd9] mb-2">
-                          Track
-                        </label>
-                        <div className="relative">
-                          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#7b8494] pointer-events-none" />
-                          <select
-                            id="reg-track"
-                            value={form.track}
-                            onChange={update('track')}
-                            className="w-full pl-12 pr-4 py-3.5 rounded-sm bg-[#0b1017] hairline text-white text-sm outline-none focus:ring-2 focus:ring-[#7547e8]/70 transition-all appearance-none"
-                          >
-                            <option value="novice">Novice — 1st & 2nd Year</option>
-                            <option value="expert">Expert — Advanced Systems</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="panel-line flex items-start gap-3 rounded-sm p-4 font-mono text-xs leading-relaxed text-[#7b8494]">
-                      <span className="mt-0.5 text-[#7547e8]">i</span>
-                      Saves your interest for 2027 updates in this browser. Final Round 1 registration opens on the official symposium portal.
-                    </div>
-
-                    <div className="flex flex-col items-center justify-between gap-4 pt-2 sm:flex-row">
-                      <button type="submit" className="btn-primary">
-                        Register interest
-                        <Send className="w-4 h-4" />
-                      </button>
-                      <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#7b8494]">
-                        Round 1 entry — 100% free
-                      </span>
-                    </div>
-                  </motion.form>
+                    REGISTER ON UNSTOP
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/70">{eventData.registrationStatus}</span>
+                  </span>
                 )}
-              </AnimatePresence>
+
+                <p className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.18em] text-[#7b8494] leading-relaxed max-w-md">
+                  Official registration and further participation details are
+                  available on Unstop.
+                </p>
+              </div>
             </div>
           </Reveal>
         </div>

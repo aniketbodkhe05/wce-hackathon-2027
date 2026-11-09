@@ -15,6 +15,7 @@ export const eventData = {
   location: "Walchand College of Engineering, A/P Vishrambag, Sangli, Maharashtra 416415",
   contactEmail: "wceacmsc@gmail.com",
   officialWebsite: "https://www.wcehackathon.in/",
+  unstopUrl: "",
   registrationStatus: "Pre-registration open",
 
   socials: {

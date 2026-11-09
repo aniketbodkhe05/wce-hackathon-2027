@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { GlobalScene } from './components/GlobalScene';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -17,26 +17,14 @@ import { FinalCTA } from './sections/FinalCTA';
 function App() {
   const [preloaderDone, setPreloaderDone] = useState(false);
 
-  useEffect(() => {
-    // Ensure preloader doesn't stick around too long
-    const safety = setTimeout(() => setPreloaderDone(true), 8000);
-    return () => clearTimeout(safety);
-  }, []);
-
   const handlePreloaderComplete = () => {
     setPreloaderDone(true);
   };
 
-  if (!preloaderDone) {
-    return (
-      <div className="bg-[#07090d]">
-        <Preloader onComplete={handlePreloaderComplete} />
-      </div>
-    );
-  }
-
   return (
     <div className="relative min-h-screen bg-[#07090d] text-[#f2f5f7] overflow-x-clip">
+      {!preloaderDone && <Preloader onComplete={handlePreloaderComplete} />}
+
       <GlobalScene />
       <div className="grid-overlay" aria-hidden="true" />
       <div className="noise-overlay" aria-hidden="true" />
